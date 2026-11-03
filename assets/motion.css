@@ -1,0 +1,58 @@
+/* =============================================================================
+   AkiCut · motion.css
+   1. Logo AkiCut
+   2. Desempenho (o que fica leve em qualquer computador)
+   3. Toques e transições (o movimento em si fica em motion.js)
+   4. Modo leve
+   ============================================================================= */
+
+/* ---------- 1. Logo: "Aki" com as cinco cores da Akiyama, "Cut" branco ---------- */
+:root{--ak-aki:linear-gradient(100deg,#e7b96a 0%,#40AF73 26%,#1BBACC 50%,#0E69BE 74%,#7818FA 100%)}
+.top .brand-aniver,.akc-nome .ak-aki{background:var(--ak-aki);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent !important;color:transparent !important}
+.top .brand-aniver{width:fit-content;padding-right:.04em}
+.top .brand-cut,.akc-nome b{color:#fff !important;-webkit-text-fill-color:#fff !important}
+#splash .sp-aniver i{background:var(--ak-aki);background-size:300% 100%;background-position:calc(var(--k,0) * 50%) 0;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent !important}
+#splash .sp-cut i,#splash .sp-cut i:nth-child(2){color:#fff !important}
+
+/* ---------- 2. Desempenho ---------- */
+/* animações escondidas não rodam */
+#busy:not(.on),#busy:not(.on) *{animation-play-state:paused !important}
+html.ak-pausa *,html.ak-pausa *::before,html.ak-pausa *::after{animation-play-state:paused !important}
+/* o menu lateral já é opaco: o desfoque por trás dele só custava processamento */
+.top{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+dialog::backdrop{-webkit-backdrop-filter:blur(3px) !important;backdrop-filter:blur(3px) !important}
+/* fundo do herói em camada própria; o anel pontilhado gira em passos (quase sem custo) */
+.ak-hero::before{will-change:transform}
+.ak-gira{animation-timing-function:steps(240) !important}
+/* o botão antigo do assistente na aba Aniversariantes saiu: o Dex faz esse papel */
+#assistantWrap{display:none !important}
+
+/* ---------- 3. Toques e transições ---------- */
+/* o "afundar" dos botões é uma mola em JS; o CSS antigo não compete com ela */
+html.ak-mola .btn:active,html.ak-mola .mchip:active,html.ak-mola .inicio-card:active,html.ak-mola .iconbtn:active,
+html.ak-mola .pcard:active,html.ak-mola .ak-chip:active,html.ak-mola .ak-btn:active,html.ak-mola .top .tabs button:active{transform:none !important}
+/* as entradas das abas também passam para o JS (molas de verdade) */
+html.ak-mola main > section .workspace-head,html.ak-mola main > section .tools,html.ak-mola main > section .ak-hero-txt,
+html.ak-mola main > section .ak-arte,html.ak-mola main > section .ak-linha,html.ak-mola main > section .ak-numeros,
+html.ak-mola main > section .months,html.ak-mola #toast .toast{animation:none !important}
+/* indicador que desliza entre as abas */
+.top .tabs{position:relative}
+.ak-glider{position:absolute;left:0;top:0;border-radius:14px;pointer-events:none;z-index:0;opacity:0;will-change:transform;
+  background:linear-gradient(90deg,rgba(255,255,255,.17),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 8px 22px rgba(0,0,0,.18)}
+html.ak-glider-on .ak-glider{opacity:1}
+html.ak-glider-on .top .tabs button{z-index:1}
+html.ak-glider-on .top .tabs button[aria-selected="true"]{background:transparent !important;box-shadow:none !important}
+/* fantasma usado nas transformações (mês selecionado, diálogos, painéis) */
+.ak-fantasma{position:fixed;left:0;top:0;pointer-events:none;z-index:2147483000;transform-origin:0 0;will-change:transform,opacity}
+/* arrastar com o mouse para os lados */
+.ak-arrasta{cursor:grab;-webkit-user-select:none;user-select:none}
+.ak-arrasta.ak-arrastando{cursor:grabbing}
+.ak-arrasta.ak-arrastando *{pointer-events:none}
+
+/* ---------- 4. Modo leve (automático em computadores mais simples, ou em Ajustes → Dex) ---------- */
+html.ak-leve *,html.ak-leve *::before,html.ak-leve *::after{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+html.ak-leve .ak-hero::before,html.ak-leve .ak-gira,html.ak-leve .ak-flutua,html.ak-leve .ak-mes i::after,html.ak-leve .hud-dot,
+html.ak-leve .orbit-a,html.ak-leve .orbit-b{animation:none !important}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

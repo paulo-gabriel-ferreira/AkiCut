@@ -1,0 +1,452 @@
+/* =============================================================================
+   DEX · dex.css
+   1. Base e cores do personagem
+   2. Camadas que se mexem (flutuar, pular) — fora do SVG, desenhadas pela placa de vídeo
+   3. Juntas e expressões (humores)
+   4. Fantasias
+   5. Balão, guia na tela e tour
+   6. Chat (o "espaço do Dex")
+   7. Painel de consumo
+   8. Estúdio do Dex (Ajustes)
+   9. Celular, modo leve e movimento reduzido
+   ============================================================================= */
+
+/* ============ 1. BASE ============ */
+:root{--dex-olho:#F3F8FF;--dex-w:96px;--dx-bg:#0c0d10;--dx-bg2:#141619;--dx-bg3:#1b1e23;--dx-linha:rgba(255,255,255,.08);
+  --dx-txt:#eef0f3;--dx-txt2:rgba(238,240,243,.66);--dx-txt3:rgba(238,240,243,.42);--dx-claro:#f4f5f7;--dx-sai:cubic-bezier(.4,0,1,1)}
+html[data-dex-tam="p"]{--dex-w:74px} html[data-dex-tam="g"]{--dex-w:124px}
+.dex{position:fixed;right:22px;bottom:12px;z-index:120;width:var(--dex-w);pointer-events:none;transition:opacity .4s ease}
+html[data-dex-lado="esquerda"] .dex{right:auto;left:22px}
+html[data-dex-lado="esquerda"] body:not(.hud-right):not(.hud-top):not(.hud-bottom):not(.hud-icons) .dex{left:290px}
+html[data-ak-orb="nao"] .dex{display:none}
+body.booting .dex{opacity:0}
+.dex-btn{all:unset;display:block;width:100%;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;border-radius:40%}
+.dex-btn:focus-visible{outline:2px solid #9aa3b2;outline-offset:4px}
+.dex-svg{display:block;width:100%;height:auto;overflow:visible}
+.dex-svg{--c-corpo:#F6F7F9;--c-meio:#E2E5EA;--c-sombra:#C4C9D1;--c-linha:#24272D;--c-visor:#0F1114;--c-visor2:#26313B}
+html[data-dex-acab="grafite"] .dex-svg{--c-corpo:#5A5F69;--c-meio:#474B54;--c-sombra:#33363D;--c-linha:#121418;--c-visor:#08090B;--c-visor2:#1C2229}
+.dex-svg .dex-tronco,.dex-svg .dex-casco,.dex-svg .dex-braco rect,.dex-svg .dex-orelha,.dex-svg .dex-topo,.dex-svg .dx-pele{fill:var(--c-corpo);stroke:var(--c-linha);stroke-width:3;stroke-linejoin:round}
+.dex-svg .dex-orelha,.dex-svg .dex-topo,.dex-svg .dex-braco rect{fill:var(--c-meio)}
+.dex-svg .dex-pescoco{fill:var(--c-sombra);stroke:var(--c-linha);stroke-width:3}
+.dex-svg .dex-tronco-sombra{fill:var(--c-sombra);opacity:.55}
+.dex-svg .dex-brilho{fill:#fff;opacity:.75}
+.dex-svg .dex-casco-brilho{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;opacity:.85}
+html[data-dex-acab="grafite"] .dex-svg .dex-brilho{opacity:.18}
+html[data-dex-acab="grafite"] .dex-svg .dex-casco-brilho{opacity:.2}
+.dex-svg .dex-costura{fill:none;stroke:var(--c-sombra);stroke-width:2.5;stroke-linecap:round}
+.dex-svg .dex-visor{stroke:var(--c-linha);stroke-width:2.5}
+.dex-svg .dex-visor-brilho{fill:none;stroke:rgba(255,255,255,.12);stroke-width:3;stroke-linecap:round}
+.dex-svg .dex-luz{fill:var(--dex-olho);opacity:.55}
+.dex-svg .dex-halo{opacity:.5}
+.dex-svg .dex-o-aberto,.dex-svg .dex-o-coracao{fill:var(--dex-olho)}
+.dex-svg .dex-o-feliz,.dex-svg .dex-o-fechado,.dex-svg .dex-o-tonto,.dex-svg .dex-boca path{fill:none;stroke:var(--dex-olho);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.dex-svg .dex-o-tonto{stroke-width:2.6}
+.dex-svg .dex-boca-o{fill:var(--dex-olho)}
+.dex-svg .dex-bochecha{fill:var(--dex-olho);opacity:0;transition:opacity .5s ease}
+.dex-svg .dex-jato{fill:var(--dex-olho);opacity:0;transform-box:fill-box;transform-origin:50% 0}
+.dex-svg .dex-fx > g > *{opacity:0}
+
+/* ============ 2. CAMADAS QUE SE MEXEM ============ */
+.dex-corpo{position:relative}
+.dex-sombra{position:absolute;left:29%;right:29%;bottom:2%;height:5%;border-radius:50%;background:rgba(15,17,20,.2);will-change:transform;animation:dexChao 4s ease-in-out infinite}
+html[data-theme="dark"] .dex-sombra{background:rgba(0,0,0,.42)}
+.dex-flut{will-change:transform;animation:dexFlutua 4s ease-in-out infinite}
+.dex-incl{transition:transform .6s var(--mola,ease)}
+.dex-mola{transform-origin:50% 90%;will-change:transform}
+@keyframes dexFlutua{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,calc(-4% * var(--dex-k,1)),0)}}
+@keyframes dexChao{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.84);opacity:.65}}
+html[data-dex-anim="sutil"]{--dex-k:.5} html[data-dex-anim="expressiva"]{--dex-k:1.6}
+.dex-corpo.pula .dex-mola{animation:dexPulo .78s cubic-bezier(.32,.72,0,1)}
+.dex-corpo.quica .dex-mola{animation:dexQuica .55s cubic-bezier(.32,.72,0,1)}
+.dex-corpo.pirueta .dex-mola{animation:dexPirueta .95s cubic-bezier(.32,.72,0,1)}
+@keyframes dexPulo{0%{transform:none}14%{transform:scale(1.14,.82)}38%{transform:translate3d(0,calc(-20% * var(--dex-k,1)),0) scale(.9,1.12)}62%{transform:scale(1.1,.9)}80%{transform:scale(.97,1.03)}100%{transform:none}}
+@keyframes dexQuica{0%{transform:none}30%{transform:scale(1.07,.93)}62%{transform:translate3d(0,-6%,0) scale(.97,1.04)}100%{transform:none}}
+@keyframes dexPirueta{0%{transform:none}20%{transform:translate3d(0,-11%,0)}50%{transform:translate3d(0,-17%,0) scaleX(-1)}80%{transform:translate3d(0,-6%,0)}100%{transform:none}}
+.dex.voando .dex-incl{transform:rotate(var(--lean,0deg))}
+.dex.voando .dex-sombra{opacity:0;animation:none}
+
+/* ============ 3. JUNTAS E EXPRESSÕES ============ */
+.dex-svg g{transform-box:view-box}
+.dex-svg .dex-cabeca{transform-origin:80px 88px;transform:rotate(var(--tilt,0deg));transition:transform .7s var(--mola,ease)}
+.dex-svg .dex-braco-e,.dex-svg .dex-braco-e .dex-osc{transform-origin:35.5px 103px}
+.dex-svg .dex-braco-d,.dex-svg .dex-braco-d .dex-osc{transform-origin:124.5px 103px}
+.dex-svg .dex-braco{transition:transform .75s var(--mola,ease)}
+.dex-svg .dex-olhos{transform:translate(var(--ox,0px),var(--oy,0px));transition:transform .32s var(--mola-rapida,ease)}
+.dex-svg .dex-o > *{transform-box:fill-box;transform-origin:center;transition:opacity .28s ease,transform .5s var(--mola,ease)}
+.dex-svg .dex-o-feliz,.dex-svg .dex-o-fechado,.dex-svg .dex-o-coracao,.dex-svg .dex-o-tonto{opacity:0;transform:scale(.55,.2)}
+.dex-svg .dex-boca > *{transform-box:fill-box;transform-origin:center;transition:opacity .25s ease,transform .45s var(--mola,ease)}
+.dex-svg .dex-boca-o,.dex-svg .dex-boca-triste{opacity:0;transform:scale(.3)}
+.dex-svg.dex-vivo .dex-braco-e .dex-osc{animation:dexBalE 5s ease-in-out infinite}
+.dex-svg.dex-vivo .dex-braco-d .dex-osc{animation:dexBalD 5s ease-in-out infinite}
+@keyframes dexBalE{0%,100%{transform:rotate(3deg)}50%{transform:rotate(-2deg)}}
+@keyframes dexBalD{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(2deg)}}
+@keyframes dexAceno{0%,100%{transform:rotate(0)}50%{transform:rotate(-20deg)}}
+@keyframes dexAcenoE{0%,100%{transform:rotate(0)}50%{transform:rotate(20deg)}}
+.dex-svg.pisca .dex-o-aberto,.dex-svg.pisca-d .dex-olho-d .dex-o-aberto{transform:scaleY(.08);transition-duration:.07s}
+
+/* olhos fechados em arco (feliz e parecidos) */
+.dex-svg:is([data-humor="feliz"],[data-humor="comemorando"],[data-humor="amor"],[data-humor="dormindo"],[data-humor="tonto"],[data-humor="espreguica"]) .dex-o-aberto{opacity:0;transform:scale(1,.15) translateY(3px)}
+.dex-svg:is([data-humor="feliz"],[data-humor="comemorando"]) .dex-o-feliz{opacity:1;transform:none}
+.dex-svg:is([data-humor="feliz"],[data-humor="amor"],[data-humor="comemorando"]) .dex-bochecha{opacity:.35}
+.dex-svg:is([data-humor="feliz"],[data-humor="comemorando"]) .dex-boca-sorriso{transform:scale(1.35,1.5)}
+/* feliz: acena (o braço sobe com mola e só depois começa o aceno) */
+.dex-svg[data-humor="feliz"] .dex-braco-d{transform:rotate(-150deg)}
+.dex-svg[data-humor="feliz"] .dex-braco-d .dex-osc{animation:dexAceno .95s ease-in-out .45s infinite}
+.dex-svg[data-humor="feliz"] .dex-braco-e{transform:rotate(16deg)}
+.dex-svg[data-humor="feliz"] .dex-fx-brilho{animation:dexBrilho 1.6s ease-out infinite}
+.dex-svg[data-humor="feliz"] .dex-fx-brilho:nth-child(2){animation-delay:.5s}
+@keyframes dexBrilho{0%{opacity:0;transform:scale(.2)}30%{opacity:1;transform:scale(1) rotate(45deg)}100%{opacity:0;transform:scale(.4) rotate(90deg)}}
+.dex-fx-brilho,.dex-fx-conf,.dex-fx-cor,.dex-fx-z{transform-box:fill-box;transform-origin:center}
+/* comemorando: braços para cima e confete */
+.dex-svg[data-humor="comemorando"] .dex-braco-e{transform:rotate(152deg)}
+.dex-svg[data-humor="comemorando"] .dex-braco-d{transform:rotate(-152deg)}
+.dex-svg[data-humor="comemorando"] .dex-braco-e .dex-osc{animation:dexAcenoE .5s ease-in-out infinite}
+.dex-svg[data-humor="comemorando"] .dex-braco-d .dex-osc{animation:dexAceno .5s ease-in-out infinite}
+.dex-svg[data-humor="comemorando"] .dex-fx-conf{animation:dexConf 1.3s cubic-bezier(.2,.7,.3,1) infinite;animation-delay:calc(var(--i) * 90ms)}
+@keyframes dexConf{0%{opacity:0;transform:translate(0,0) scale(.4)}15%{opacity:1}100%{opacity:0;transform:translate(var(--cx),var(--cy)) rotate(260deg)}}
+/* surpresa */
+.dex-svg[data-humor="surpresa"] .dex-o-aberto{transform:scale(1.22,1.28)}
+.dex-svg[data-humor="surpresa"] .dex-boca-sorriso{opacity:0;transform:scale(.3)}
+.dex-svg[data-humor="surpresa"] .dex-boca-o{opacity:1;transform:none}
+.dex-svg[data-humor="surpresa"] .dex-braco-e{transform:rotate(40deg)}
+.dex-svg[data-humor="surpresa"] .dex-braco-d{transform:rotate(-40deg)}
+.dex-svg:is([data-humor="surpresa"],[data-humor="triste"],[data-humor="amor"],[data-humor="espreguica"],[data-humor="apontando"]) .dex-osc{animation:none !important}
+/* pensando: mão no queixo, olhos para cima e pontinhos */
+.dex-svg[data-humor="pensando"] .dex-olhos{transform:translate(5px,-6px)}
+.dex-svg[data-humor="pensando"] .dex-cabeca{transform:rotate(7deg)}
+.dex-svg[data-humor="pensando"] .dex-braco-e{transform:rotate(-112deg)}
+.dex-svg[data-humor="pensando"] .dex-braco-e .dex-osc{animation:none}
+.dex-svg[data-humor="pensando"] .dex-o-aberto{transform:scaleY(.8)}
+.dex-svg[data-humor="pensando"] .dex-boca-sorriso{transform:scale(.6,.4) translateX(3px)}
+.dex-svg[data-humor="pensando"] .dex-fx-ponto{animation:dexPonto 1.2s ease-in-out infinite}
+.dex-svg[data-humor="pensando"] .dex-fx-ponto:nth-child(2){animation-delay:.18s}
+.dex-svg[data-humor="pensando"] .dex-fx-ponto:nth-child(3){animation-delay:.36s}
+@keyframes dexPonto{0%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+/* ouvindo */
+.dex-svg[data-humor="ouvindo"] .dex-cabeca{transform:rotate(-6deg)}
+.dex-svg[data-humor="ouvindo"] .dex-o-aberto{transform:scale(1.06)}
+/* falando */
+.dex-svg[data-humor="falando"] .dex-boca-sorriso{opacity:0}
+.dex-svg[data-humor="falando"] .dex-boca-o{opacity:1;animation:dexFala .22s ease-in-out infinite alternate}
+.dex-svg[data-humor="falando"] .dex-braco-d{transform:rotate(-34deg)}
+.dex-svg[data-humor="falando"] .dex-braco-d .dex-osc{animation:dexAceno 1.4s ease-in-out infinite}
+@keyframes dexFala{from{transform:scale(1.1,.25)}to{transform:scale(1,1)}}
+/* triste */
+.dex-svg[data-humor="triste"] .dex-olho-e .dex-o-aberto{transform:scaleY(.62) rotate(-16deg)}
+.dex-svg[data-humor="triste"] .dex-olho-d .dex-o-aberto{transform:scaleY(.62) rotate(16deg)}
+.dex-svg[data-humor="triste"] .dex-olhos{transform:translate(0,3px)}
+.dex-svg[data-humor="triste"] .dex-boca-sorriso{opacity:0}
+.dex-svg[data-humor="triste"] .dex-boca-triste{opacity:1;transform:none}
+.dex-svg[data-humor="triste"] .dex-cabeca{transform:rotate(-4deg) translateY(3px)}
+.dex-svg[data-humor="triste"] .dex-braco-e{transform:rotate(-6deg)}
+.dex-svg[data-humor="triste"] .dex-braco-d{transform:rotate(6deg)}
+/* dormindo e espreguiçando */
+.dex-svg:is([data-humor="dormindo"],[data-humor="espreguica"]) .dex-o-fechado{opacity:1;transform:none}
+.dex-svg[data-humor="dormindo"] .dex-boca-sorriso{transform:scale(.5,.3)}
+.dex-svg[data-humor="dormindo"] .dex-cabeca{transform:rotate(-7deg) translateY(2px)}
+.dex-svg[data-humor="dormindo"] .dex-halo{opacity:.2}
+.dex-svg[data-humor="dormindo"] .dex-fx-z{animation:dexZ 3s ease-in infinite}
+.dex-svg[data-humor="dormindo"] .dex-fx-z:nth-child(2){animation-delay:1s}
+.dex-svg[data-humor="dormindo"] .dex-fx-z:nth-child(3){animation-delay:2s}
+@keyframes dexZ{0%{opacity:0;transform:scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(16px,-26px) scale(1.15)}}
+.dex-fx-z{font:700 13px/1 system-ui,sans-serif;fill:#8A919C}
+.dex-svg[data-humor="espreguica"] .dex-boca-o{opacity:1;transform:scale(1,1.2)}
+.dex-svg[data-humor="espreguica"] .dex-boca-sorriso{opacity:0}
+.dex-svg[data-humor="espreguica"] .dex-braco-e{transform:rotate(168deg);transition-duration:1.1s}
+.dex-svg[data-humor="espreguica"] .dex-braco-d{transform:rotate(-168deg);transition-duration:1.1s}
+/* amor */
+.dex-svg[data-humor="amor"] .dex-o-coracao{opacity:1;transform:none;animation:dexBate .6s ease-in-out infinite}
+.dex-svg[data-humor="amor"] .dex-boca-sorriso{transform:scale(1.4,1.6)}
+.dex-svg[data-humor="amor"] .dex-braco-e{transform:rotate(132deg)}
+.dex-svg[data-humor="amor"] .dex-braco-d{transform:rotate(-132deg)}
+.dex-svg[data-humor="amor"] .dex-fx-cor{animation:dexSobe 1.4s ease-out infinite}
+.dex-svg[data-humor="amor"] .dex-fx-cor:nth-child(2){animation-delay:.45s}
+.dex-svg[data-humor="amor"] .dex-fx-cor:nth-child(3){animation-delay:.9s}
+@keyframes dexBate{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes dexSobe{0%{opacity:0;transform:translateY(6px) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+.dex-fx-cor{fill:#C9CED6;stroke:#24272D;stroke-width:1.5}
+/* tonto */
+.dex-svg[data-humor="tonto"] .dex-o-tonto{opacity:1;transform:none;animation:dexGira 1s linear infinite}
+.dex-svg[data-humor="tonto"] .dex-cabeca{animation:dexBamboleia 1s ease-in-out infinite}
+.dex-svg[data-humor="tonto"] .dex-boca-sorriso{opacity:0}
+.dex-svg[data-humor="tonto"] .dex-boca-triste{opacity:1;transform:scale(1.1,.6)}
+@keyframes dexGira{to{transform:rotate(360deg)}}
+@keyframes dexBamboleia{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+/* voando (guia): braços para trás e jatinhos */
+.dex-svg[data-humor="voando"] .dex-braco-e{transform:rotate(36deg)}
+.dex-svg[data-humor="voando"] .dex-braco-d{transform:rotate(-36deg)}
+.dex-svg[data-humor="voando"] .dex-braco-e .dex-osc{animation:dexAcenoE .32s ease-in-out infinite}
+.dex-svg[data-humor="voando"] .dex-braco-d .dex-osc{animation:dexAceno .32s ease-in-out infinite}
+.dex-svg[data-humor="voando"] .dex-jato{opacity:.95;animation:dexJato .12s ease-in-out infinite alternate}
+@keyframes dexJato{from{transform:scaleY(.55)}to{transform:scaleY(1.15)}}
+/* apontando: o braço gira até a direção do botão */
+.dex-svg[data-humor="apontando"][data-braco="e"] .dex-braco-e{transform:rotate(var(--ap,90deg))}
+.dex-svg[data-humor="apontando"][data-braco="d"] .dex-braco-d{transform:rotate(var(--ap,-90deg))}
+.dex-svg[data-humor="apontando"][data-braco="e"] .dex-braco-d{transform:rotate(-10deg)}
+.dex-svg[data-humor="apontando"][data-braco="d"] .dex-braco-e{transform:rotate(10deg)}
+.dex-svg[data-humor="apontando"] .dex-o-aberto{transform:scale(1.08)}
+.dex-svg[data-humor="apontando"] .dex-boca-sorriso{transform:scale(1.2,1.3)}
+.dex-svg.sim .dex-cabeca{animation:dexSim .5s ease-in-out}
+@keyframes dexSim{0%,100%{transform:rotate(var(--tilt,0deg))}50%{transform:rotate(var(--tilt,0deg)) translateY(3px)}}
+
+/* ============ 4. FANTASIAS ============ */
+.dex-svg .dx-l{stroke:var(--c-linha);stroke-width:2.6;stroke-linejoin:round}
+.dex-svg .dex-cab,.dex-svg .dex-ros,.dex-svg .dex-crp{display:none}
+.dex-svg[data-cab="antena"] .dex-cab-antena,.dex-svg[data-cab="festa"] .dex-cab-festa,.dex-svg[data-cab="natal"] .dex-cab-natal,.dex-svg[data-cab="coelho"] .dex-cab-coelho,
+.dex-svg[data-cab="formatura"] .dex-cab-formatura,.dex-svg[data-cab="chef"] .dex-cab-chef,.dex-svg[data-cab="coroa"] .dex-cab-coroa,.dex-svg[data-cab="fones"] .dex-cab-fones,
+.dex-svg[data-rosto="oculos"] .dex-ros-oculos,.dex-svg[data-rosto="escuros"] .dex-ros-escuros,.dex-svg[data-rosto="bigode"] .dex-ros-bigode,
+.dex-svg[data-corpo="gravata"] .dex-crp-gravata,.dex-svg[data-corpo="cachecol"] .dex-crp-cachecol,.dex-svg[data-corpo="noel"] .dex-crp-noel{display:inline}
+.dex-svg .dex-cab-antena path{stroke:var(--c-linha);stroke-width:3;stroke-linecap:round}
+.dex-svg .dex-cab-antena circle{fill:var(--dex-olho);stroke:var(--c-linha);stroke-width:2.5}
+.dex-svg .dex-bigode-coelho{stroke:var(--dex-olho);stroke-width:1.6;stroke-linecap:round;opacity:.55;fill:none}
+
+/* ============ 5. BALÃO, GUIA E TOUR ============ */
+.dex-balao{position:absolute;right:calc(100% - 26px);bottom:calc(100% - 10px);width:max-content;max-width:250px;padding:11px 15px;border-radius:20px 20px 5px 20px;
+  background:var(--dx-bg);color:var(--dx-txt);font:500 13px/1.42 var(--f-ui,system-ui);box-shadow:0 18px 44px rgba(8,10,14,.32);border:1px solid var(--dx-linha);
+  opacity:0;transform:translateY(8px) scale(.85);transform-origin:100% 100%;pointer-events:none;transition:opacity .25s ease,transform .5s var(--mola-pula,ease)}
+.dex-balao b{font-weight:600;color:#fff}
+html[data-dex-lado="esquerda"] .dex-balao,.dex.balao-dir .dex-balao{right:auto;left:calc(100% - 26px);border-radius:20px 20px 20px 5px;transform-origin:0 100%}
+html[data-dex-lado="esquerda"] .dex.balao-esq .dex-balao{left:auto;right:calc(100% - 26px);border-radius:20px 20px 5px 20px;transform-origin:100% 100%}
+.dex.balao-baixo .dex-balao{bottom:auto;top:calc(100% - 4px);border-radius:5px 20px 20px 20px;transform-origin:0 0}
+.dex.balao-baixo.balao-esq .dex-balao{border-radius:20px 5px 20px 20px;transform-origin:100% 0}
+.dex-balao.on{opacity:1;transform:none;pointer-events:auto;cursor:pointer}
+.dx-veu{position:fixed;inset:0;z-index:116;background:rgba(6,8,12,.5);pointer-events:none;opacity:0;transition:opacity .35s ease}
+.dx-veu.on{opacity:1}
+.dx-anel{position:fixed;left:0;top:0;z-index:117;pointer-events:none;border-radius:16px;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 0 6px rgba(255,255,255,.12),0 0 30px rgba(255,255,255,.35);
+  opacity:0;transition:opacity .3s ease;will-change:transform}
+.dx-anel.on{opacity:1}
+.dx-anel::after{content:"";position:absolute;inset:-6px;border-radius:inherit;border:2px solid rgba(255,255,255,.7);animation:dxPulsa 1.6s cubic-bezier(.32,.72,0,1) infinite}
+@keyframes dxPulsa{0%{transform:scale(.98);opacity:1}70%,100%{transform:scale(1.08);opacity:0}}
+html.dex-guia #aiChat.open{opacity:0 !important;pointer-events:none !important}
+html.dex-guia .dex{z-index:121;opacity:1 !important}
+.dx-tour{position:fixed;left:50%;bottom:22px;z-index:122;display:flex;align-items:center;gap:6px;padding:6px;border-radius:999px;background:var(--dx-bg);color:var(--dx-txt);
+  border:1px solid var(--dx-linha);box-shadow:0 24px 60px rgba(8,10,14,.4);transform:translateX(-50%);font:500 13px/1 var(--f-ui,system-ui);touch-action:pan-y}
+.dx-tour button{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.08);transition:background .2s ease}
+.dx-tour button:hover{background:rgba(255,255,255,.16)}
+.dx-tour button[disabled]{opacity:.3;cursor:default}
+.dx-tour svg{width:16px;height:16px}
+.dx-tour-meio{display:grid;gap:7px;min-width:190px;padding:0 10px}
+.dx-tour-meio span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dx-tour-meio span em{font-style:normal;color:var(--dx-txt3);margin-right:6px}
+.dx-tour-barra{height:3px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.dx-tour-barra i{display:block;height:100%;width:100%;background:#fff;transform-origin:left;transform:scaleX(0)}
+.dx-tour .dx-sair{width:auto;padding:0 14px;border-radius:999px}
+
+/* ============ 6. CHAT: O ESPAÇO DO DEX ============ */
+#aiChat{--panel:#16181c;--panel2:#1c1f24;--ink:#eef0f3;--ink2:rgba(238,240,243,.74);--ink3:rgba(238,240,243,.48);--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.06);
+  --accent-soft:rgba(255,255,255,.07);--accent-ink:#fff;--accent2:#c9ced6;--shadow:none;
+  width:min(400px,calc(100vw - 24px)) !important;height:min(640px,calc(100vh - 36px)) !important;border-radius:32px !important;overflow:hidden !important;color:var(--dx-txt) !important;
+  background:radial-gradient(120% 60% at 50% -10%,#2a2d34 0%,rgba(42,45,52,0) 60%),var(--dx-bg) !important;border:1px solid var(--dx-linha) !important;
+  -webkit-backdrop-filter:none !important;backdrop-filter:none !important;box-shadow:0 40px 110px rgba(4,5,8,.5),0 0 0 .5px rgba(255,255,255,.06) inset !important;
+  transform-origin:100% 100%;transition:opacity .22s ease,transform .3s var(--dx-sai),visibility 0s linear .3s !important}
+#aiChat:not(.open){opacity:0 !important;transform:translate(20px,24px) scale(.72) !important}
+#aiChat.open{transition:none !important;opacity:1;transform:none}
+html.dex-on:not([data-ak-orb="nao"]) #aiChat{right:calc(var(--dex-w) + 36px) !important;bottom:20px !important}
+html.dex-on[data-dex-lado="esquerda"]:not([data-ak-orb="nao"]) #aiChat{right:24px !important}
+#aiChat .ai-chat-head{position:relative;background:transparent !important;padding:18px 14px 10px 16px !important;gap:8px !important;border:0 !important;display:flex !important;align-items:center !important;cursor:grab;touch-action:none}
+#aiChat .ai-chat-head::before{content:"" !important;display:block !important;position:absolute !important;inset:auto !important;left:50% !important;top:7px !important;width:36px !important;height:4px !important;
+  border-radius:4px !important;background:rgba(255,255,255,.16) !important;transform:translateX(-50%);opacity:1 !important}
+#aiChat .ai-chat-head::after{display:none !important}
+#aiChat .ai-brand{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+#aiChat .ai-chat-head .ai-avatar{width:58px !important;height:52px !important;border-radius:18px !important;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.12),rgba(255,255,255,.02)) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07) !important;display:grid !important;place-items:center;padding:4px !important;filter:none !important}
+#aiChat .ai-title b{font:650 17px/1.1 var(--f-ui) !important;letter-spacing:-.01em;color:#fff !important}
+#aiChat .ai-title small{display:none !important}
+.dx-st{display:flex;align-items:center;gap:7px;margin-top:5px;font:400 12px/1.2 var(--f-ui,system-ui);color:var(--dx-txt2);white-space:nowrap}
+.dx-st i{width:7px;height:7px;border-radius:50%;background:#5bd69a;box-shadow:0 0 0 3px rgba(91,214,154,.16);flex:none;transition:background .3s ease}
+#aiChat[data-dex="local"] .dx-st i{background:#c9ced6;box-shadow:0 0 0 3px rgba(201,206,214,.14)}
+#aiChat[data-dex="limite"] .dx-st i{background:#ffb35c;box-shadow:0 0 0 3px rgba(255,179,92,.16)}
+.dx-onda{display:none;gap:2.5px;align-items:center;height:11px}
+.dx-onda b{display:block;width:3px;height:100%;border-radius:3px;background:#fff;transform:scaleY(.3);animation:dxOnda .9s ease-in-out infinite}
+.dx-onda b:nth-child(2){animation-delay:.12s}.dx-onda b:nth-child(3){animation-delay:.24s}.dx-onda b:nth-child(4){animation-delay:.36s}
+@keyframes dxOnda{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+#aiChat.dx-pensa .dx-onda{display:flex}
+#aiChat .ai-chat-head .dx-bt,#aiChat #aiClose{all:unset;position:relative;flex:none;width:40px !important;height:40px !important;border-radius:50% !important;display:grid !important;place-items:center;cursor:pointer;
+  color:#fff !important;background:rgba(255,255,255,.07) !important;border:0 !important;box-shadow:none !important;font:300 22px/1 system-ui !important;transition:background .2s ease}
+#aiChat .ai-chat-head .dx-bt:hover,#aiChat #aiClose:hover{background:rgba(255,255,255,.14) !important}
+#aiChat .ai-chat-head .dx-bt svg{width:17px;height:17px}
+.dx-uso{position:relative}
+.dx-uso svg.dx-ring{position:absolute;inset:3px;width:34px !important;height:34px !important;transform:rotate(-90deg)}
+.dx-ring circle{fill:none;stroke-width:3}
+.dx-ring .f{stroke:rgba(255,255,255,.14)} .dx-ring .a{stroke:#fff;stroke-linecap:round;transition:stroke-dashoffset 1s var(--mola,ease)}
+.dx-uso span{font:650 9px/1 var(--f-num,system-ui);color:#fff}
+/* mensagens */
+#aiChat .ai-chat-body{background:transparent !important;padding:12px 16px 12px 16px !important;gap:10px !important;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14px,#000 calc(100% - 10px),transparent);mask-image:linear-gradient(to bottom,transparent 0,#000 14px,#000 calc(100% - 10px),transparent)}
+#aiChat .ai-msg{animation:none !important;font-size:13.5px !important;line-height:1.5 !important;box-shadow:none !important}
+#aiChat .ai-msg.bot:not(.ak-rico),#aiChat .ai-welcome-copy{background:rgba(255,255,255,.065) !important;border:1px solid rgba(255,255,255,.06) !important;color:var(--dx-txt) !important;border-radius:20px 20px 20px 6px !important}
+#aiChat .ai-msg.user{background:var(--dx-claro) !important;color:#121316 !important;border:0 !important;border-radius:20px 20px 6px 20px !important}
+#aiChat .ai-msg.bot{position:relative;margin-left:40px !important}
+#aiChat .ai-msg.bot::before{display:none !important}
+#aiChat .ai-welcome{margin-left:0}
+#aiChat .ai-welcome .ai-avatar{width:30px !important;height:28px !important;background:none !important;box-shadow:none !important}
+.dex-av{position:absolute;left:-40px;bottom:-1px;width:32px;height:28px;display:none;pointer-events:none}
+#aiChat .ai-msg.bot:not(:has(+ .ai-msg.bot)) > .dex-av{display:block}
+.dex-av .dex-svg{width:100%;height:100%}
+.ai-msg.dex-ia{white-space:pre-wrap}
+.dex-txt{overflow:hidden}
+.dex-palavra{display:inline-block;opacity:0;animation:dxPalavra .42s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i) * 18ms)}
+@keyframes dxPalavra{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dex-pontos{display:inline-flex;gap:5px;padding:5px 2px}
+.dex-pontos i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5);animation:dxPulo 1.1s cubic-bezier(.32,.72,0,1) infinite}
+.dex-pontos i:nth-child(2){animation-delay:.15s}.dex-pontos i:nth-child(3){animation-delay:.3s}
+@keyframes dxPulo{0%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-5px);opacity:1}}
+#aiChat .ak-card,#aiChat .ak-starter{background:rgba(255,255,255,.05) !important;border:1px solid rgba(255,255,255,.07) !important;border-radius:20px !important;box-shadow:none !important}
+#aiChat .ak-starter:hover{background:rgba(255,255,255,.09) !important}
+#aiChat .ak-btn{border-radius:999px !important;background:rgba(255,255,255,.08) !important;color:#fff !important;border:0 !important}
+#aiChat .ak-btn.pri,#aiChat .ak-btn:hover{background:var(--dx-claro) !important;color:#121316 !important}
+#aiChat .ai-msg.dex-aviso{font-size:12px !important;color:var(--dx-txt2) !important}
+#aiChat .ak-chips{padding:4px 16px 8px !important}
+#aiChat .ak-chip{background:rgba(255,255,255,.06) !important;border:1px solid rgba(255,255,255,.08) !important;color:var(--dx-txt) !important;border-radius:999px !important}
+#aiChat .ak-chip:hover{background:rgba(255,255,255,.12) !important}
+#aiChat .ai-suggestions{display:none !important}
+#aiChat .ai-chat-input{margin:2px 12px 12px !important;padding:6px !important;border:1px solid rgba(255,255,255,.08) !important;border-radius:28px !important;background:rgba(255,255,255,.06) !important;
+  gap:6px !important;align-items:center;box-shadow:none !important;transition:background .25s ease,border-color .25s ease}
+#aiChat .ai-chat-input:focus-within{background:rgba(255,255,255,.09) !important;border-color:rgba(255,255,255,.16) !important}
+#aiChat .ai-chat-input input{border:0 !important;background:transparent !important;box-shadow:none !important;color:#fff !important;font-size:14px !important;padding:9px 6px !important}
+#aiChat .ai-chat-input input::placeholder{color:var(--dx-txt3)}
+#aiChat .ak-slash{width:40px !important;height:40px !important;border-radius:50% !important;background:rgba(255,255,255,.08) !important;color:#fff !important;border:0 !important;box-shadow:none !important}
+#aiChat .ai-chat-input button[type="submit"]{width:40px !important;height:40px !important;border-radius:50% !important;background:var(--dx-claro) !important;color:#121316 !important;flex:none;border:0 !important;
+  transform:scale(.72);opacity:.3;transition:transform .55s var(--mola-pula,ease),opacity .25s ease !important}
+#aiChat .ai-chat-input.tem-texto button[type="submit"]{transform:none;opacity:1}
+#aiChat .ak-pal{border-radius:22px !important;background:var(--dx-bg2) !important;border:1px solid var(--dx-linha) !important}
+
+/* ============ 7. PAINEL DE CONSUMO ============ */
+.dx-cortina{position:absolute;inset:0;z-index:5;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .3s ease}
+.dx-cortina.on{opacity:1;pointer-events:auto}
+.dx-folha{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;max-height:calc(100% - 70px);overflow:auto;padding:10px 18px 18px;border-radius:26px;background:var(--dx-bg2);
+  border:1px solid var(--dx-linha);box-shadow:0 -20px 60px rgba(0,0,0,.4);transform:translateY(110%);visibility:hidden;scrollbar-width:none;touch-action:pan-y}
+.dx-folha.on{visibility:visible;transform:none}
+.dx-folha .dx-pega{width:38px;height:4px;border-radius:4px;background:rgba(255,255,255,.18);margin:0 auto 14px}
+.dx-folha header{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 16px}
+.dx-folha header b{font:650 18px/1.1 var(--f-ui);color:#fff}
+.dx-folha header small{font-size:11.5px;color:var(--dx-txt3)}
+.dx-hero{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:center;padding:16px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--dx-linha)}
+.dx-hero-ring{position:relative;width:118px;height:118px;display:grid;place-items:center}
+.dx-hero-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.dx-hero-ring circle{fill:none;stroke-width:10}
+.dx-hero-ring .f{stroke:rgba(255,255,255,.08)} .dx-hero-ring .a{stroke:url(#dxGrad);stroke-linecap:round}
+.dx-hero-ring b{font:700 30px/1 var(--f-num,system-ui);color:#fff;letter-spacing:-.03em}
+.dx-hero-ring b small{font-size:.5em;margin-left:1px}
+.dx-hero-ring em{position:absolute;top:66%;font-style:normal;font-size:10.5px;color:var(--dx-txt3)}
+.dx-hero-txt strong{display:block;font:600 15px/1.3 var(--f-ui);color:#fff;margin:0 0 6px}
+.dx-hero-txt p{margin:0;font-size:12.5px;line-height:1.45;color:var(--dx-txt2)}
+.dx-hero-txt .dx-chip{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-size:11.5px;color:var(--dx-txt)}
+.dx-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.dx-trio div{padding:12px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid var(--dx-linha)}
+.dx-trio b{display:block;font:700 19px/1 var(--f-num,system-ui);color:#fff}
+.dx-trio span{display:block;margin-top:6px;font-size:11px;color:var(--dx-txt3)}
+.dx-bloco{padding:14px;border-radius:20px;background:rgba(255,255,255,.045);border:1px solid var(--dx-linha);margin:0 0 10px}
+.dx-bloco h6{display:flex;justify-content:space-between;margin:0 0 10px;font:600 12.5px/1 var(--f-ui);color:#fff}
+.dx-bloco h6 span{font-weight:400;color:var(--dx-txt3)}
+.dx-bloco p{margin:8px 0 0;font-size:11.5px;color:var(--dx-txt3);line-height:1.4}
+.dx-trilho{height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+.dx-trilho i{display:block;height:100%;width:100%;border-radius:inherit;background:linear-gradient(90deg,#c9ced6,#fff);transform-origin:left;transform:scaleX(var(--v,0))}
+.dx-trilho.baixo i{background:linear-gradient(90deg,#ffb35c,#ffd58a)}
+.dx-barras{display:flex;align-items:flex-end;gap:5px;height:56px}
+.dx-barras i{flex:1;max-width:18px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#fff,rgba(255,255,255,.35));height:calc(var(--h) * 100%);transform-origin:bottom}
+.dx-info{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.dx-info span{padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.06);font-size:11.5px;color:var(--dx-txt2)}
+.dx-acoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dx-acoes button{all:unset;cursor:pointer;text-align:center;padding:12px;border-radius:16px;background:rgba(255,255,255,.07);color:#fff;font:500 12.5px/1 var(--f-ui);transition:background .2s ease}
+.dx-acoes button:hover{background:rgba(255,255,255,.13)}
+.dx-acoes button.pri{background:var(--dx-claro);color:#121316}
+.dx-vazio{display:grid;justify-items:center;text-align:center;gap:8px;padding:18px 10px}
+.dx-vazio .dex-svg{width:70px}
+.dx-vazio p{margin:0;font-size:13px;color:var(--dx-txt2);max-width:260px}
+
+/* ============ 8. ESTÚDIO DO DEX ============ */
+.dx-cartao{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;width:100%;padding:12px 16px 12px 12px;border-radius:22px;
+  background:radial-gradient(120% 140% at 0% 0%,#2a2d34 0%,var(--dx-bg) 60%);color:var(--dx-txt);border:1px solid rgba(255,255,255,.06);box-shadow:0 14px 34px rgba(8,10,14,.22)}
+.dx-cartao .dex-svg{width:70px;height:60px}
+.dx-cartao b{display:block;font:650 15px/1.2 var(--f-ui);color:#fff}
+.dx-cartao small{display:block;margin-top:4px;font-size:12px;color:var(--dx-txt2)}
+.dx-cartao i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);font-style:normal;font-size:18px;color:#fff}
+dialog.dx-est{width:min(960px,96vw);max-width:none !important;height:min(660px,92vh);padding:0;border:0 !important;border-radius:32px !important;overflow:hidden;background:var(--dx-bg) !important;color:var(--dx-txt);
+  box-shadow:0 50px 140px rgba(0,0,0,.55) !important}
+dialog.dx-est::backdrop{background:rgba(4,5,8,.62)}
+.dx-est-in{display:grid;grid-template-columns:1fr 1.15fr;height:100%}
+.dx-est-palco{position:relative;display:grid;place-items:center;align-content:center;gap:10px;padding:28px;overflow:hidden;touch-action:pan-y;cursor:grab;
+  background:radial-gradient(70% 55% at 50% 42%,#2b2f37 0%,#16181c 60%,var(--dx-bg) 100%)}
+.dx-est-palco.arrastando{cursor:grabbing}
+.dx-est-palco::after{content:"";position:absolute;left:18%;right:18%;bottom:19%;height:16%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.1),transparent);pointer-events:none}
+.dx-est-dex{width:min(210px,52%);position:relative;z-index:1}
+.dx-est-nome{all:unset;box-sizing:border-box;width:220px;text-align:center;font:700 26px/1.1 var(--f-ui);letter-spacing:-.02em;color:#fff;padding:6px 10px;border-radius:14px;transition:background .2s ease;z-index:1}
+.dx-est-nome:hover,.dx-est-nome:focus{background:rgba(255,255,255,.06) !important;box-shadow:none !important;border:0 !important;outline:none !important}
+.dx-est-nome{border:0 !important;box-shadow:none !important;background:transparent !important;color:#fff !important}
+.dx-est-tema{display:flex;align-items:center;gap:10px;z-index:1}
+.dx-est-tema button{all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);color:#fff;font-size:18px}
+.dx-est-tema button:hover{background:rgba(255,255,255,.15)}
+.dx-est-tema span{min-width:120px;text-align:center;font:500 13px/1 var(--f-ui);color:var(--dx-txt2)}
+.dx-est-dica{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:11.5px;color:var(--dx-txt3);margin:0}
+.dx-est-lado{display:grid;grid-template-rows:auto auto 1fr auto;min-height:0;background:var(--dx-bg2);border-left:1px solid var(--dx-linha)}
+.dx-est-lado header{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px}
+.dx-est-lado header b{font:650 20px/1.1 var(--f-ui);color:#fff}
+.dx-est-lado header button{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);color:#fff;font-size:20px}
+.dx-abas{position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:0 24px 6px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06)}
+.dx-abas button{all:unset;position:relative;z-index:1;text-align:center;cursor:pointer;padding:9px 4px;font:500 12.5px/1 var(--f-ui);color:var(--dx-txt2);transition:color .25s ease}
+.dx-abas button[aria-selected="true"]{color:#121316;font-weight:600}
+.dx-abas .dx-pol{position:absolute;z-index:0;top:4px;left:4px;bottom:4px;border-radius:999px;background:var(--dx-claro);will-change:transform}
+.dx-paineis{position:relative;overflow:hidden auto;padding:14px 24px 18px;scrollbar-width:thin}
+.dx-painel[hidden]{display:none}
+.dx-rot{display:block;font:600 10.5px/1 var(--f-ui);letter-spacing:.16em;text-transform:uppercase;color:var(--dx-txt3);margin:18px 0 10px}
+.dx-rot:first-child{margin-top:4px}
+.dx-seg{position:relative;display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06)}
+.dx-seg button{all:unset;position:relative;z-index:1;cursor:pointer;padding:9px 15px;border-radius:999px;font:500 12.5px/1 var(--f-ui);color:var(--dx-txt2);transition:color .25s ease}
+.dx-seg button[aria-pressed="true"]{color:#121316;font-weight:600}
+.dx-seg .dx-pol{position:absolute;z-index:0;left:0;top:0;border-radius:999px;background:var(--dx-claro);will-change:transform}
+.dx-cores{display:flex;gap:12px}
+.dx-cores button{all:unset;cursor:pointer;width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 0 0 3px var(--dx-bg2),0 0 0 4px rgba(255,255,255,.1);transition:box-shadow .3s ease}
+.dx-cores button[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 0 0 3px var(--dx-bg2),0 0 0 6px #fff}
+.dx-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+.dx-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;justify-items:center;gap:7px;padding:12px 6px 10px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid var(--dx-linha);
+  font:500 11.5px/1.2 var(--f-ui);color:var(--dx-txt2);text-align:center;transition:background .2s ease,border-color .2s ease}
+.dx-card:hover{background:rgba(255,255,255,.08)}
+.dx-card[aria-pressed="true"]{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55);color:#fff}
+.dx-card .dex-svg{width:56px;height:44px}
+.dx-card .dex-svg.dex-inteiro{width:38px;height:52px}
+.dx-carrossel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -24px;padding:2px 24px 8px;scrollbar-width:none}
+.dx-carrossel::-webkit-scrollbar{display:none}
+.dx-carrossel .dx-card{flex:none;width:104px;scroll-snap-align:start;padding:14px 8px 12px}
+.dx-carrossel .dx-card .dex-svg.dex-inteiro{width:54px;height:72px}
+.dx-jeitos{display:grid;gap:8px}
+.dx-jeito{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:5px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid var(--dx-linha);transition:background .2s ease,border-color .2s ease}
+.dx-jeito b{font:600 14px/1.2 var(--f-ui);color:#fff}
+.dx-jeito span{font-size:12.5px;color:var(--dx-txt2);font-style:italic}
+.dx-jeito[aria-pressed="true"]{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.55)}
+.dx-lista{display:grid;border-radius:20px;background:rgba(255,255,255,.045);border:1px solid var(--dx-linha);overflow:hidden}
+.dx-linha{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid var(--dx-linha);font-size:13.5px;color:var(--dx-txt)}
+.dx-linha:first-child{border-top:0}
+.dx-linha small{display:block;margin-top:3px;font-size:11.5px;color:var(--dx-txt3)}
+.dx-sw{all:unset;cursor:pointer;flex:none;position:relative;width:48px;height:29px;border-radius:999px;background:rgba(255,255,255,.14);transition:background .3s ease}
+.dx-sw::after{content:"";position:absolute;left:3px;top:3px;width:23px;height:23px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:transform .55s var(--mola-pula,ease),width .25s ease}
+.dx-sw:active::after{width:28px}
+.dx-sw[aria-checked="true"]{background:#5bd69a}
+.dx-sw[aria-checked="true"]::after{transform:translateX(19px)}
+.dx-sw[aria-checked="true"]:active::after{transform:translateX(14px)}
+.dx-nota{font-size:12px;color:var(--dx-txt3);line-height:1.45;margin:10px 0 0}
+.dx-est-pe{display:flex;gap:8px;justify-content:space-between;padding:14px 24px 20px;border-top:1px solid var(--dx-linha)}
+.dx-est-pe button{all:unset;cursor:pointer;padding:11px 16px;border-radius:999px;background:rgba(255,255,255,.07);color:#fff;font:500 13px/1 var(--f-ui);transition:background .2s ease}
+.dx-est-pe button:hover{background:rgba(255,255,255,.13)}
+.dx-est-pe .pri{background:var(--dx-claro);color:#121316}
+.dx-est-pe .pri:hover{background:#fff}
+
+/* ============ 9. CELULAR, MODO LEVE E MOVIMENTO REDUZIDO ============ */
+@media (max-width:760px){
+  .dex{right:12px;bottom:10px;--dex-w:68px;width:68px}
+  html.dex-chat-aberto:not(.dex-guia) .dex{opacity:0;pointer-events:none}
+  html.dex-chat-aberto:not(.dex-guia) .dex *{pointer-events:none !important}
+  html.dex-on #aiChat,html.dex-on:not([data-ak-orb="nao"]) #aiChat,html.dex-on[data-dex-lado="esquerda"]:not([data-ak-orb="nao"]) #aiChat{right:10px !important;bottom:10px !important;height:calc(100vh - 20px) !important;width:calc(100vw - 20px) !important}
+  .dex-balao{max-width:200px;font-size:12.5px}
+  dialog.dx-est{width:100vw;height:100vh;max-height:none;border-radius:0 !important}
+  .dx-est-in{grid-template-columns:1fr;grid-template-rows:290px 1fr}
+  .dx-est-dex{width:130px}
+  .dx-est-lado{border-left:0;border-top:1px solid var(--dx-linha);min-height:0}
+  .dx-tour{left:10px;right:10px;transform:none}
+  .dx-tour-meio{min-width:0;flex:1}
+}
+html.ak-leve .dex-svg.dex-vivo .dex-osc,html.ak-leve .dex-sombra{animation:none !important}
+html.ak-leve .dex-palavra{animation:none !important;opacity:1}
+.dex-fixo,.dex-fixo *{animation:none !important;transition:none !important}
+html[data-ak-mov="suaves"] .dex-flut,html[data-ak-mov="suaves"] .dex-sombra,html[data-ak-mov="suaves"] .dex-osc{animation:none !important}
+@media (prefers-reduced-motion:reduce){.dex *,.dex-svg *{animation:none !important}}

@@ -99,7 +99,7 @@ const TRECHOS = [
    "olhos",
    "acessorio"
   ],
-  "t": "O Dex é o assistente do AkiCut. Para personalizá-lo, passe o mouse sobre ele e clique no lápis, ou use o botão de lápis no topo do chat. Dá para mudar o nome, o tamanho, a cor dos olhos, o acabamento (claro ou grafite), o acessório (antena ou chapéu de festa), a intensidade das animações, se ele segue o mouse, as dicas em balão e o lado da tela. Para ocultá-lo, use Configurações, Assistente."
+  "t": "O Dex é o assistente do AkiCut. Tudo dele se ajusta em Ajustes (a engrenagem), na seção Dex, ou pela engrenagem no topo do chat. Aparência: nome, tamanho, cor dos olhos e acabamento (claro ou grafite). Fantasias: temas prontos (Natal, Páscoa, Formatura, Festa, Chef, DJ, Realeza) e peças de cabeça (antena, chapéu de festa, gorro de Papai Noel, orelhas de coelho, capelo, chapéu de chef, coroa, fones), de rosto (óculos, óculos escuros, bigode) e roupas (gravata, cachecol, roupa de Noel), além da fantasia automática da época. Conversa: jeito (divertido, equilibrado ou formal) e idioma (português, inglês ou espanhol). Comportamento: animações, truques, seguir o mouse, dicas em balão, lado da tela e mostrar ou ocultar. Tocando no nome do Dex no topo do chat aparece o painel de consumo da IA; digitar /status mostra o resumo e /tour faz um tour guiado."
  },
  {
   "k": [

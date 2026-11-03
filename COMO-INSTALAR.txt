@@ -50,9 +50,24 @@ PRIVACIDADE
 
 
 PERSONALIZAR O DEX
-  Passe o mouse sobre ele e clique no lápis (ou no lápis do topo do chat, ou em Configurações →
-  Assistente (Dex) → Personalizar o Dex): nome, tamanho, cor dos olhos, acabamento, acessório,
-  animações, seguir o mouse, dicas em balão e lado da tela. Fica salvo no navegador de cada pessoa.
+  Ajustes (engrenagem do menu) → seção "Dex, o assistente", ou a engrenagem no topo do chat.
+  Abas: Aparência (nome, tamanho, olhos, acabamento) · Fantasias (temas prontos e peças de cabeça,
+  rosto e roupa; fantasia automática da época) · Conversa (jeito divertido/equilibrado/formal e idioma)
+  · Comportamento (animações, truques, seguir o mouse, balões, lado da tela, mostrar/ocultar).
+  Fica salvo no navegador de cada pessoa.
+
+MUDAR O JEITO DE FALAR (mais a fundo)
+  O texto de cada jeito fica em api/dex.js, no começo, em JEITOS (divertido, equilibrado, formal).
+  Edite o texto entre aspas e publique de novo.
+
+CONSUMO DA IA
+  No chat, toque no nome do Dex (a "ilha" preta no topo): aparece o estado, o modelo, a velocidade,
+  as perguntas e tokens de hoje neste navegador, a cota diária da equipe e o fôlego por minuto.
+  Também dá para digitar /status ou perguntar "quanto você consumiu hoje?" (não gasta IA).
+
+GUIA NA TELA
+  Pergunte "onde fica importar lista?" e o Dex voa até o botão e aponta com o braço.
+  Digite /tour para um tour completo pelo site.
 
 ENSINAR ALGO NOVO AO DEX
   Em api/_dex-conhecimento.js, adicione um item na lista TRECHOS:

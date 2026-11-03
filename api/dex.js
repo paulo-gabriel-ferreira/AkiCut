@@ -13,7 +13,7 @@ const { NUCLEO, TRECHOS } = require('./_dex-conhecimento.js');
 const MODELOS_GROQ = (process.env.DEX_MODELOS_GROQ || 'openai/gpt-oss-120b,qwen/qwen3.8-27b').split(',').map(s => s.trim()).filter(Boolean);
 const MODELOS_OR = (process.env.DEX_MODELOS_OR || 'thinkingmachines/inkling-small:free,nvidia/nemotron-3-ultra-550b-a55b:free').split(',').map(s => s.trim()).filter(Boolean);
 
-const ACOES = new Set(['aba', 'resumo', 'pendencias', 'hoje', 'semana', 'mes30', 'espaco', 'confirmar', 'buscar', 'arte', 'gerar_mes', 'gerar_arte', 'ir_mes',
+const ACOES = new Set(['tour', 'aba', 'resumo', 'pendencias', 'hoje', 'semana', 'mes30', 'espaco', 'confirmar', 'buscar', 'arte', 'gerar_mes', 'gerar_arte', 'ir_mes',
   'importar_lista', 'importar_fotos', 'unificar', 'sem_foto', 'ajustar', 'chapeleiro', 'zip', 'preparar', 'configuracoes', 'tema', 'editar_dex']);
 
 /* limite simples por visitante, para proteger a cota gratuita */
@@ -36,8 +36,15 @@ function trechosPara(pergunta) {
   }).filter(o => o.s > 1).sort((a, b) => b.s - a.s).slice(0, 7).map(o => '- ' + o.x.t).join('\n');
 }
 
-function instrucoes(nome, contexto, pergunta) {
-  return `Você é ${nome}, o assistente do AkiCut: um robozinho simpático, gentil e direto. Responda sempre em português do Brasil, em texto simples e curto (no máximo 4 frases ou uma lista curta), com tom acolhedor e profissional. Não use emojis.
+const JEITOS = {
+  divertido: 'Seu jeito: alegre, brincalhão e caloroso, como um robozinho de desenho animado. Use humor leve (trocadilhos com robôs, bolos, chapéus de festa, tesouras e aniversários), solte de vez em quando um "Bip-bop!" ou um "Opa!" (não em toda resposta) e comemore as conquistas do usuário. Pode usar no máximo um emoji por resposta, só quando combinar. A ajuda vem primeiro; a graça vem junto, sem enrolar.',
+  equilibrado: 'Seu jeito: simpático, claro e prestativo, com um toque leve de bom humor de vez em quando. Não use emojis.',
+  formal: 'Seu jeito: cordial, profissional e objetivo, sem brincadeiras e sem emojis.'
+};
+const IDIOMAS = { pt: 'Responda sempre em português do Brasil.', en: 'Always answer in English (keep the names of buttons and tabs exactly as they appear in Portuguese, in quotes).', es: 'Responde siempre en español (mantén los nombres de botones y pestañas tal como aparecen en portugués, entre comillas).' };
+
+function instrucoes(nome, jeito, idioma, contexto, pergunta) {
+  return `Você é ${nome}, o assistente do AkiCut: um robozinho 2D cinza, branco e preto que mora no canto da tela. ${JEITOS[jeito] || JEITOS.divertido} ${IDIOMAS[idioma] || IDIOMAS.pt} Seja curto: no máximo 4 frases ou uma lista curta.
 
 SOBRE O SITE
 ${NUCLEO}
@@ -56,26 +63,43 @@ Você pode pedir ao site para fazer algo colocando, no FIM da resposta, uma ou m
 [[acao:buscar:NOME]] buscar colaborador · [[acao:arte:NOME]] abrir a arte de alguém · [[acao:gerar_arte:NOME]] gerar a arte de alguém
 [[acao:ir_mes:MES]] abrir um mês (ex.: novembro) · [[acao:gerar_mes:MES]] gerar as artes de um mês (o site pede confirmação)
 [[acao:importar_lista]] [[acao:importar_fotos]] [[acao:unificar]] [[acao:ajustar]] [[acao:chapeleiro]] [[acao:zip]] [[acao:preparar]] [[acao:configuracoes]] [[acao:tema]] [[acao:editar_dex]] · viram um botão para o usuário confirmar
+[[acao:tour]] faz um tour guiado pelo site (você voa pela tela apontando as partes principais)
 Use uma ação só quando o usuário pedir para fazer ou ver algo. Nunca diga que já fez algo: diga "vou abrir", "aqui está" ou "clique no botão abaixo".
+
+MOSTRAR NA TELA
+Quando o usuário perguntar onde fica algo ou como fazer algo, você voa até o lugar e aponta com o braço. Use UMA marca [[mostrar:ID]] com um destes IDs:
+abas: aba_inicio, aba_aniv, aba_arte, aba_colab, aba_novos · Aniversariantes: importar_lista, adicionar_pessoa, gerar_mes, preparar, gerar_proximo, zip, meses, ano
+Arte: auto, chapeleiro, modelos, textos, png, anterior, proxima · Colaboradores: importar_pasta, fotos_soltas, zip_fotos, novo_colaborador, unificar, padronizar, supabase, limpar, backup, restaurar, ordenar, buscar
+Novos colaboradores: novos_modelo, novos_busca, novos_baixar, novos_copiar · Geral: tema, ajustes
+
+EXPRESSÃO
+Comece a resposta com UMA marca de humor para o seu rosto animar: [[humor:feliz]] [[humor:comemorando]] [[humor:surpresa]] [[humor:pensando]] [[humor:amor]] [[humor:tonto]] [[humor:triste]].
 
 REGRAS
 - Fale só do AkiCut e de assuntos de trabalho ligados a ele. Para outros assuntos, responda em uma frase gentil e volte ao app.
 - Não invente botões, telas ou números. Se não souber, diga que não tem certeza e sugira onde procurar.
 - Use os números da situação atual quando ajudarem.
-- Você não vê fotos nem nomes do cadastro; para pessoas específicas, use as ações buscar ou arte.`;
+- Você não vê fotos nem nomes do cadastro; para pessoas específicas, use as ações buscar ou arte.
+- Se perguntarem quanto você consome, seu estado ou seus limites, diga que o painel aparece tocando no seu nome no topo do chat, ou digitando /status.`;
 }
 
 function limpar(texto) {
   return String(texto || '').replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<\/?think>/gi, '').trim();
 }
+const ALVOS = new Set(['aba_inicio','aba_aniv','aba_arte','aba_colab','aba_novos','importar_lista','adicionar_pessoa','gerar_mes','preparar','gerar_proximo','zip','meses','ano',
+  'auto','chapeleiro','modelos','textos','png','anterior','proxima','importar_pasta','fotos_soltas','zip_fotos','novo_colaborador','unificar','padronizar','supabase','limpar',
+  'backup','restaurar','ordenar','buscar','novos_modelo','novos_busca','novos_baixar','novos_copiar','tema','ajustes']);
+const HUMORES = new Set(['feliz','comemorando','surpresa','pensando','amor','tonto','triste']);
 function extrairAcoes(texto) {
-  const acoes = [];
+  const acoes = []; let humor = null, mostrar = null;
+  texto = texto.replace(/\[\[\s*humor\s*:\s*([a-z]+)\s*\]\]/gi, (_, h) => { h = h.toLowerCase(); if (!humor && HUMORES.has(h)) humor = h; return ''; });
+  texto = texto.replace(/\[\[\s*mostrar\s*:\s*([a-z_]+)\s*\]\]/gi, (_, m) => { m = m.toLowerCase(); if (!mostrar && ALVOS.has(m)) mostrar = m; return ''; });
   const t = texto.replace(/\[\[\s*acao\s*:\s*([a-z_0-9]+)(?:\s*:\s*([^\]]{1,60}))?\s*\]\]/gi, (_, id, arg) => {
     id = id.toLowerCase();
     if (ACOES.has(id) && acoes.length < 3) acoes.push(arg ? { id, arg: arg.trim() } : { id });
     return '';
   });
-  return { texto: t.replace(/\n{3,}/g, '\n\n').trim(), acoes };
+  return { texto: t.replace(/\[\[[^\]]*\]\]/g, '').replace(/\n{3,}/g, '\n\n').trim(), acoes, humor, mostrar };
 }
 
 async function chamar(url, chave, corpo, extraHeaders) {
@@ -87,8 +111,15 @@ async function chamar(url, chave, corpo, extraHeaders) {
       body: JSON.stringify(corpo)
     });
     const j = await r.json().catch(() => ({}));
-    return { status: r.status, j };
-  } catch (e) { return { status: 0, j: {} }; }
+    const h = k => r.headers.get(k);
+    const n = k => { const v = h(k); return v == null || v === '' ? null : Number(v); };
+    const limites = {
+      req_limite_dia: n('x-ratelimit-limit-requests'), req_restantes_dia: n('x-ratelimit-remaining-requests'),
+      tok_limite_min: n('x-ratelimit-limit-tokens'), tok_restantes_min: n('x-ratelimit-remaining-tokens'),
+      reset_req: h('x-ratelimit-reset-requests'), reset_tok: h('x-ratelimit-reset-tokens'), tentar_em: h('retry-after')
+    };
+    return { status: r.status, j, limites };
+  } catch (e) { return { status: 0, j: {}, limites: {} }; }
   finally { clearTimeout(timer); }
 }
 
@@ -96,8 +127,9 @@ async function perguntar(mensagens) {
   const tentativas = [];
   if (process.env.GROQ_API_KEY) MODELOS_GROQ.forEach(m => tentativas.push({ prov: 'groq', m }));
   if (process.env.OPENROUTER_API_KEY) MODELOS_OR.forEach(m => tentativas.push({ prov: 'or', m }));
-  let ultimo = 'sem_chave';
+  let ultimo = 'sem_chave', limitesUlt = {};
   for (const t of tentativas) {
+    const t0 = Date.now();
     const base = { model: t.m, messages: mensagens, temperature: 0.5 };
     let r;
     if (t.prov === 'groq') {
@@ -109,16 +141,21 @@ async function perguntar(mensagens) {
         { 'X-Title': 'AkiCut - Dex' });
     }
     const texto = limpar(r.j && r.j.choices && r.j.choices[0] && r.j.choices[0].message && r.j.choices[0].message.content);
-    if (r.status === 200 && texto) return { ok: true, texto, modelo: t.m };
+    const u = (r.j && r.j.usage) || {};
+    if (r.status === 200 && texto) return { ok: true, texto, modelo: t.m, provedor: t.prov === 'groq' ? 'Groq' : 'OpenRouter', ms: Date.now() - t0,
+      uso: { entrada: u.prompt_tokens || 0, saida: u.completion_tokens || 0, total: u.total_tokens || 0 }, limites: r.limites };
     ultimo = r.status === 429 ? 'limite' : r.status === 401 || r.status === 403 ? 'chave_invalida' : 'indisponivel';
+    if (r.status === 429) limitesUlt = r.limites || {};
   }
-  return { ok: false, erro: ultimo };
+  return { ok: false, erro: ultimo, limites: limitesUlt };
 }
 
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const temIA = !!(process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY);
-  if (req.method === 'GET') return res.status(200).json({ ok: true, ia: temIA });
+  if (req.method === 'GET') return res.status(200).json({ ok: true, ia: temIA,
+    provedor: process.env.GROQ_API_KEY ? 'Groq' : process.env.OPENROUTER_API_KEY ? 'OpenRouter' : null,
+    modelos: (process.env.GROQ_API_KEY ? MODELOS_GROQ : []).concat(process.env.OPENROUTER_API_KEY ? MODELOS_OR : []) });
   if (req.method !== 'POST') return res.status(405).json({ erro: 'metodo' });
 
   /* só o próprio site pode usar esta função */
@@ -135,6 +172,8 @@ module.exports = async function handler(req, res) {
   let corpo = req.body;
   if (typeof corpo === 'string') { try { corpo = JSON.parse(corpo); } catch (e) { corpo = {}; } }
   corpo = corpo || {};
+  const jeito = ['divertido', 'equilibrado', 'formal'].includes(corpo.jeito) ? corpo.jeito : 'divertido';
+  const idioma = ['pt', 'en', 'es'].includes(corpo.idioma) ? corpo.idioma : 'pt';
   const nome = String(corpo.nome || 'Dex').replace(/[^\p{L}\p{N} ._-]/gu, '').slice(0, 20) || 'Dex';
   const hist = (Array.isArray(corpo.mensagens) ? corpo.mensagens : []).slice(-8)
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
@@ -142,8 +181,8 @@ module.exports = async function handler(req, res) {
   if (!hist.length || hist[hist.length - 1].role !== 'user') return res.status(400).json({ erro: 'mensagem' });
 
   const pergunta = hist[hist.length - 1].content;
-  const r = await perguntar([{ role: 'system', content: instrucoes(nome, corpo.contexto, pergunta) }].concat(hist));
-  if (!r.ok) return res.status(r.erro === 'limite' ? 429 : 503).json({ erro: r.erro });
-  const { texto, acoes } = extrairAcoes(r.texto);
-  return res.status(200).json({ texto: texto || 'Certo.', acoes, modelo: r.modelo });
+  const r = await perguntar([{ role: 'system', content: instrucoes(nome, jeito, idioma, corpo.contexto, pergunta) }].concat(hist));
+  if (!r.ok) return res.status(r.erro === 'limite' ? 429 : 503).json({ erro: r.erro, limites: r.limites });
+  const { texto, acoes, humor, mostrar } = extrairAcoes(r.texto);
+  return res.status(200).json({ texto: texto || 'Certo.', acoes, humor, mostrar, modelo: r.modelo, provedor: r.provedor, ms: r.ms, uso: r.uso, limites: r.limites });
 };

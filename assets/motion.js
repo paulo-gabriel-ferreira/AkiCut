@@ -26,7 +26,8 @@
     pts.push(1); return {easing:'linear('+pts.join(', ')+')',duration:Math.round(t*1000)};
   }
   var LIN=!!(W.CSS&&CSS.supports&&CSS.supports('transition-timing-function','linear(0, 1)'));
-  var SP=LIN?{suave:curva(150,24.5),calma:curva(90,19),morph:curva(170,26),rapida:curva(240,31),pula:curva(260,14),elastica:curva(180,11)}
+  /* molas um pouco mais macias: movimento mais longo e fluido, sem perder a resposta */
+  var SP=LIN?{suave:curva(118,21.5),calma:curva(72,16.8),morph:curva(138,23),rapida:curva(210,28.5),pula:curva(200,15.5),elastica:curva(150,12.5)}
     :{suave:{easing:'cubic-bezier(.22,1,.36,1)',duration:700},calma:{easing:'cubic-bezier(.22,1,.36,1)',duration:950},morph:{easing:'cubic-bezier(.2,.9,.25,1)',duration:680},
       rapida:{easing:'cubic-bezier(.22,1,.36,1)',duration:480},pula:{easing:'cubic-bezier(.34,1.56,.64,1)',duration:600},elastica:{easing:'cubic-bezier(.34,1.8,.64,1)',duration:800}};
   if(LIN){ H.style.setProperty('--mola',SP.suave.easing); H.style.setProperty('--mola-pula',SP.pula.easing); H.style.setProperty('--mola-rapida',SP.rapida.easing); }
@@ -118,7 +119,7 @@
     gl.style.borderRadius=getComputedStyle(b).borderRadius;
     gl.style.width=box.w+'px'; gl.style.height=box.h+'px'; gl.style.transform='translate('+box.x+'px,'+box.y+'px)';
     if(animar&&glAntes&&(glAntes.x!==box.x||glAntes.y!==box.y))
-      anima(gl,[{transform:'translate('+glAntes.x+'px,'+glAntes.y+'px)',width:glAntes.w+'px',height:glAntes.h+'px'},{transform:'translate('+box.x+'px,'+box.y+'px)',width:box.w+'px',height:box.h+'px'}],'suave');
+      anima(gl,[{transform:'translate('+glAntes.x+'px,'+glAntes.y+'px) scale('+(glAntes.w/box.w)+','+(glAntes.h/box.h)+')'},{transform:'translate('+box.x+'px,'+box.y+'px)'}],'suave');
     glAntes=box; H.classList.add('ak-glider-on');
   }
   if(tabs){

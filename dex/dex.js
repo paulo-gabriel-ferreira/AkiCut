@@ -45,7 +45,7 @@
 
   /* =================================================================== 2. CONFIGURAÇÃO */
   var PADRAO={nome:'Dex',tam:'m',olhos:'branco',acab:'claro',cab:'nenhum',rosto:'nenhum',corpo:'nenhum',epoca:'sim',
-    jeito:'divertido',idioma:'pt',anim:'normal',seguir:'sim',balao:'sim',truques:'sim',lado:'direita'};
+    jeito:'divertido',idioma:'pt',anim:'normal',seguir:'sim',balao:'sim',truques:'sim',lado:'direita',tema:'noite'};
   var CFG=(function(){ var c={}; try{ c=JSON.parse(LS.get('dex-cfg','{}'))||{}; }catch(e){}
     if(c.acess&&!c.cab) c.cab=c.acess==='chapeu'?'festa':c.acess==='antena'?'antena':'nenhum';
     var o={}; for(var k in PADRAO) o[k]=c[k]!=null?c[k]:PADRAO[k]; return o; })();
@@ -185,7 +185,12 @@
     var card=D.querySelector('#inicioAssistente .inicio-txt'); if(card) card.innerHTML='<b>Conversar com o '+esc(n)+'</b><small>Tire dúvidas e peça ações por chat</small>';
     D.querySelectorAll('.dx-nome-atual').forEach(function(x){ x.textContent=n; });
   }
+  /* tema do chat, do painel e do estúdio: Noite, Grafite, Névoa ou Automático (segue o tema do site) */
+  function siteEscuro(){ var t=H.getAttribute('data-theme'); if(t==='dark') return true; if(t==='light') return false; try{ return matchMedia('(prefers-color-scheme: dark)').matches; }catch(e){ return false; } }
+  function aplicarTema(){ var t=CFG.tema==='auto'?(siteEscuro()?'noite':'nevoa'):CFG.tema; if(t==='noite') H.removeAttribute('data-dx-tema'); else H.setAttribute('data-dx-tema',t); }
+  new MutationObserver(function(){ if(CFG.tema==='auto') aplicarTema(); }).observe(H,{attributes:true,attributeFilter:['data-theme']});
   function aplicarCfg(){
+    aplicarTema();
     H.setAttribute('data-dex-tam',CFG.tam); H.setAttribute('data-dex-acab',CFG.acab); H.setAttribute('data-dex-anim',CFG.anim); H.setAttribute('data-dex-lado',CFG.lado);
     H.style.setProperty('--dex-olho',OLHOS[CFG.olhos]||OLHOS.branco);
     if(CFG.seguir!=='sim') olharPara(0,0,0);
@@ -247,8 +252,10 @@
   }
   D.addEventListener('pointermove',function(e){ px=e.clientX; py=e.clientY; atividade(); if(!raf) raf=requestAnimationFrame(seguir); },{passive:true});
   var tSono=0;
+  var ultAtiv=0;
   function atividade(){
-    E.ultimoMov=Date.now();
+    var agora=Date.now(); if(!E.dormindo&&agora-ultAtiv<300){ E.ultimoMov=agora; return; } ultAtiv=agora;
+    E.ultimoMov=agora;
     if(E.dormindo){ E.dormindo=false; reagir('surpresa',650); pular(); }
     clearTimeout(tSono); tSono=setTimeout(function(){ if(!aberto()&&!E.hover&&!E.guia){ E.dormindo=true; olharPara(0,2,0); render(); } },75000);
   }
@@ -300,7 +307,7 @@
       if(ab&&!chat.__dexAb){
         balao.classList.remove('on'); E.dormindo=false; reagir('surpresa',520); setTimeout(function(){ reagir('feliz',1300); },540);
         if(!parado()&&!H.classList.contains('dex-guia')){
-          M.morph(btn,chat,{cor:'#0c0d10',raioDe:btn.offsetWidth/2});
+          M.morph(btn,chat,{cor:(getComputedStyle(chat).backgroundColor||'#0c0d10'),raioDe:btn.offsetWidth/2});
           [chat.querySelector('.ai-chat-head'),msgs,chat.querySelector('.ak-chips'),form].forEach(function(n,i){ M.anima(n,[{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'none'}],'calma',{delay:120+i*55,fill:'backwards'}); });
         }
       }
@@ -405,7 +412,7 @@
     veu.style.clipPath=furo(caixa.x,caixa.y,caixa.w,caixa.h,caixa.r);
     anel.style.width=caixa.w+'px'; anel.style.height=caixa.h+'px'; anel.style.borderRadius=caixa.r+'px'; anel.style.transform='translate('+caixa.x+'px,'+caixa.y+'px)';
     if(animar){ M.anima(veu,[{clipPath:furo(de.x,de.y,de.w,de.h,de.r)},{clipPath:veu.style.clipPath}],'morph');
-      M.anima(anel,[{transform:'translate('+de.x+'px,'+de.y+'px)',width:de.w+'px',height:de.h+'px'},{transform:anel.style.transform,width:caixa.w+'px',height:caixa.h+'px'}],'morph'); }
+      M.anima(anel,[{transform:'translate('+de.x+'px,'+de.y+'px) scale('+(de.w/caixa.w).toFixed(3)+','+(de.h/caixa.h).toFixed(3)+')'},{transform:anel.style.transform}],'morph'); }
     ultCaixa=caixa; veu.classList.add('on'); anel.classList.add('on');
     /* onde o Dex fica: ao lado do botão, com o braço apontando para ele */
     var Wd=raiz.offsetWidth, Hd=Wd*214/160, casa=homeRect();
@@ -525,7 +532,19 @@
     if(form) form.addEventListener('submit',function(){ var b=form.querySelector('button[type="submit"]'); if(b) M.anima(b,[{transform:'scale(1)'},{transform:'scale(.8) rotate(-25deg)',offset:.35},{transform:'scale(1.12) rotate(0)',offset:.7},{transform:'scale(1)'}],'suave'); });
   })();
   function textoModo(){ return modoIA==='ia'?'online · com IA':modoIA==='limite'?'IA no limite · modo local':'modo local · respostas básicas'; }
-  function pctCota(){ var l=USO.ultimo&&USO.ultimo.limites; if(l&&l.req_limite_dia&&l.req_restantes_dia!=null) return Math.max(0,Math.min(1,l.req_restantes_dia/l.req_limite_dia)); return null; }
+  /* o Groq informa quanto falta para a cota encher de novo (ex.: "2m52.8s"); ela se recupera aos poucos,
+     então a cota de agora é estimada a partir da última leitura e do tempo que passou */
+  function duracao(t){ if(t==null||t==='') return null; t=String(t); var m=t.match(/^(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m(?!s))?(?:(\d+(?:\.\d+)?)s)?(?:(\d+(?:\.\d+)?)ms)?$/);
+    if(!m) return isNaN(+t)?null:+t; return (+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0)+(+m[4]||0)/1000; }
+  function quando(seg){ if(seg==null) return ''; if(seg<60) return 'menos de 1 min'; if(seg<3600) return Math.round(seg/60)+' min'; var h=Math.floor(seg/3600), mi=Math.round((seg%3600)/60); return h+' h'+(mi?' '+mi+' min':''); }
+  function estimar(lim,rest,reset,quandoMs){
+    if(!lim||rest==null) return null; var falta=lim-rest, cheio=duracao(reset), passou=quandoMs?Math.max(0,(Date.now()-quandoMs)/1000):0;
+    if(cheio==null||cheio<=0||falta<=0) return {livre:rest,lim:lim,cheioEm:falta>0?null:0};
+    return {livre:Math.min(lim,Math.round(rest+falta*Math.min(1,passou/cheio))),lim:lim,cheioEm:Math.max(0,cheio-passou)};
+  }
+  function cota(){ var u=USO.ultimo||{}, l=u.limites||{}; return estimar(l.req_limite_dia,l.req_restantes_dia,l.reset_req,u.quando); }
+  function folego(){ var u=USO.ultimo||{}, l=u.limites||{}; return estimar(l.tok_limite_min,l.tok_restantes_min,l.reset_tok,u.quando); }
+  function pctCota(){ var c=cota(); return c?Math.max(0,Math.min(1,c.livre/c.lim)):null; }
   function atualizarCabecalho(){
     if(!chat) return; chat.setAttribute('data-dex',modoIA);
     var st=chat.querySelector('.dx-st em'); if(st) st.textContent=E.pensando?'pensando':textoModo();
@@ -550,8 +569,8 @@
     if(a) a.finished.then(f,f); else f();
   }
   function renderFolha(){
-    usoDia(); var u=USO.ultimo||{}, l=u.limites||{}, p=pctCota(), tpm=l.tok_limite_min&&l.tok_restantes_min!=null?l.tok_restantes_min/l.tok_limite_min:null;
-    var hs=(USO.hist||[]).slice(-14), mx=Math.max.apply(null,hs.concat([1])), media=USO.perguntas?Math.round(USO.ms/USO.perguntas):null, tok=(USO.entrada||0)+(USO.saida||0);
+    usoDia(); var u=USO.ultimo||{}, c=cota(), fo=folego(), p=pctCota(), tpm=fo?fo.livre/fo.lim:null;
+    var hs=(USO.hist||[]).slice(-14), mx=Math.max.apply(null,hs.concat([1])), media=USO.perguntas&&USO.ms>0?Math.round(USO.ms/USO.perguntas):null, tok=(USO.entrada||0)+(USO.saida||0);
     var minutos=u.quando?Math.round((Date.now()-u.quando)/60000):null;
     var h='<div class="dx-pega"></div><header><b>Meu consumo</b><small>'+(minutos==null?'hoje':minutos<1?'atualizado agora':'atualizado há '+minutos+' min')+'</small></header>';
     if(p==null&&!USO.perguntas){
@@ -560,12 +579,12 @@
       var off=(339*(1-(p==null?0:p))).toFixed(1);
       h+='<div class="dx-hero"><div class="dx-hero-ring"><svg viewBox="0 0 118 118"><defs><linearGradient id="dxGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#9aa1ac"/></linearGradient></defs>'+
           '<circle class="f" cx="59" cy="59" r="54"/><circle class="a" cx="59" cy="59" r="54" stroke-dasharray="339" stroke-dashoffset="'+off+'" data-off="'+off+'"/></svg>'+
-          '<b>'+(p==null?'—':'<span data-conta="'+Math.round(p*100)+'">0</span><small>%</small>')+'</b><em>livre hoje</em></div>'+
-        '<div class="dx-hero-txt"><strong>'+(p==null?'Cota ainda não medida':p<.15?'A cota está acabando':'Tem bastante IA para hoje')+'</strong>'+
-          '<p>'+(p==null?'Faça uma pergunta para eu medir.':fmt(l.req_restantes_dia)+' de '+fmt(l.req_limite_dia)+' perguntas livres para toda a equipe.')+'</p>'+
-          (l.reset_req?'<span class="dx-chip">renova em '+esc(l.reset_req)+'</span>':'')+'</div></div>'+
-        '<div class="dx-trio"><div><b data-conta="'+(USO.perguntas||0)+'">0</b><span>perguntas suas hoje</span></div><div><b>'+mil(tok)+'</b><span>tokens gastos</span></div><div><b>'+(media?seg1(media):'—')+'</b><span>tempo médio</span></div></div>'+
-        '<div class="dx-bloco"><h6>Fôlego agora <span>'+(tpm==null?'—':fmt(l.tok_restantes_min)+' de '+fmt(l.tok_limite_min))+'</span></h6><div class="dx-trilho'+(tpm!=null&&tpm<.2?' baixo':'')+'"><i style="--v:'+(tpm==null?0:tpm.toFixed(3))+'"></i></div>'+
+          '<b>'+(p==null?'—':'<span data-conta="'+Math.round(p*100)+'">0</span><small>%</small>')+'</b><em>livre agora</em></div>'+
+        '<div class="dx-hero-txt"><strong>'+(p==null?'Cota ainda não medida':p<.15?'A cota está acabando':p<.5?'Ainda dá para muita conversa':'Tem bastante IA disponível')+'</strong>'+
+          '<p>'+(p==null?'Faça uma pergunta para eu medir.':'Cerca de '+fmt(c.livre)+' de '+fmt(c.lim)+' perguntas livres para toda a equipe. A cota se recupera aos poucos ao longo do dia.')+'</p>'+
+          (c&&c.cheioEm>0?'<span class="dx-chip">cheia de novo em '+quando(c.cheioEm)+'</span>':c&&c.cheioEm===0?'<span class="dx-chip">cota cheia</span>':'')+'</div></div>'+
+        '<div class="dx-trio"><div><b data-conta="'+(USO.perguntas||0)+'">0</b><span>perguntas suas hoje</span></div><div><b>'+mil(tok)+'</b><span>tokens gastos</span></div><div><b>'+(media?seg1(media):'—')+'</b><span>resposta média</span></div></div>'+
+        '<div class="dx-bloco"><h6>Fôlego agora <span>'+(fo?fmt(fo.livre)+' de '+fmt(fo.lim)+' tokens por minuto':'—')+'</span></h6><div class="dx-trilho'+(tpm!=null&&tpm<.2?' baixo':'')+'"><i style="--v:'+(tpm==null?0:tpm.toFixed(3))+'"></i></div>'+
           '<p>É o limite por minuto. Se acabar, espero alguns segundos e volto a responder.</p></div>'+
         (hs.length?'<div class="dx-bloco"><h6>Tamanho das últimas respostas <span>tokens</span></h6><div class="dx-barras">'+hs.map(function(v){ return '<i style="--h:'+Math.max(.08,v/mx).toFixed(3)+'" title="'+fmt(v)+' tokens"></i>'; }).join('')+'</div></div>':'');
     }
@@ -583,21 +602,23 @@
     });
   }
   function cartaoStatus(){
-    usoDia(); var b=el('div','ai-msg bot dex-ia'), u=USO.ultimo||{}, l=u.limites||{}, p=pctCota();
+    usoDia(); var b=el('div','ai-msg bot dex-ia'), p=pctCota(), c=cota();
     b.innerHTML='<div class="dex-txt">'+esc(CFG.jeito==='formal'?'Resumo do meu consumo hoje:':'Raio-X do meu cérebro de robô:')+'\n• '+esc(textoModo())+'\n• '+fmt(USO.perguntas)+' perguntas e '+mil((USO.entrada||0)+(USO.saida||0))+' tokens hoje'+
-      (p!=null?'\n• '+Math.round(p*100)+'% da cota da equipe ainda livre':'')+'\n• '+fmt(USO.locais||0)+' respostas sem gastar IA</div>';
+      (p!=null?'\n• '+Math.round(p*100)+'% da cota da equipe livre agora'+(c&&c.cheioEm>0?' (cheia de novo em '+quando(c.cheioEm)+')':''):'')+'\n• '+fmt(USO.locais||0)+' respostas sem gastar IA</div>';
     msgs.appendChild(b); rolar();
     var g=el('div','ak-btns'), x=el('button','ak-btn pri','Ver o painel completo'); x.type='button'; x.onclick=abrirFolha; g.appendChild(x); b.appendChild(g); reagir('feliz',1400);
   }
 
   /* =================================================================== 10. ESTÚDIO DO DEX */
+  var TEMAS_CHAT=[['noite','Noite','linear-gradient(160deg,#2a2d34,#0c0d10)'],['grafite','Grafite','linear-gradient(160deg,#3c4048,#26292f)'],
+    ['nevoa','Névoa','linear-gradient(160deg,#ffffff,#e9ebef)'],['auto','Automático','linear-gradient(135deg,#ffffff 0 50%,#0c0d10 50% 100%)']];
   var est=null, abaEst='visual', ABAS=[['visual','Visual'],['fantasias','Fantasias'],['conversa','Conversa'],['jeito','Jeito']];
   function pilula(box,animar){
     var sel=box.querySelector('[aria-pressed="true"],[aria-selected="true"]'), pol=box.querySelector('.dx-pol'); if(!sel||!pol) return;
     var novo={x:sel.offsetLeft,y:sel.offsetTop,w:sel.offsetWidth,h:sel.offsetHeight}, ant=pol.__box;
-    pol.style.width=novo.w+'px'; pol.style.height=novo.h+'px'; pol.style.transform='translate('+(novo.x-(box.classList.contains('dx-abas')?4:0))+'px,'+(novo.y-(box.classList.contains('dx-abas')?4:0))+'px)';
-    if(animar&&ant&&(ant.x!==novo.x||ant.y!==novo.y)){ var dx=box.classList.contains('dx-abas')?4:0;
-      M.anima(pol,[{transform:'translate('+(ant.x-dx)+'px,'+(ant.y-dx)+'px)',width:ant.w+'px',height:ant.h+'px'},{transform:pol.style.transform,width:novo.w+'px',height:novo.h+'px'}],'suave'); }
+    pol.style.width=novo.w+'px'; pol.style.height=novo.h+'px'; pol.style.transform='translate('+(novo.x-0)+'px,'+(novo.y-0)+'px)';
+    if(animar&&ant&&(ant.x!==novo.x||ant.y!==novo.y)){ var dx=0;
+      M.anima(pol,[{transform:'translate('+(ant.x-dx)+'px,'+(ant.y-dx)+'px) scale('+(ant.w/novo.w).toFixed(3)+','+(ant.h/novo.h).toFixed(3)+')'},{transform:pol.style.transform}],'suave'); }
     pol.__box=novo;
   }
   function seg(k,ops){ return '<div class="dx-seg" data-k="'+k+'"><i class="dx-pol"></i>'+ops.map(function(o){ return '<button type="button" data-v="'+o[0]+'" aria-pressed="'+(valor(k)===o[0])+'">'+esc(o[1])+'</button>'; }).join('')+'</div>'; }
@@ -623,7 +644,9 @@
           '<div class="dx-painel" data-p="visual"><span class="dx-rot">Tamanho</span>'+seg('tam',[['p','Pequeno'],['m','Médio'],['g','Grande']])+
             '<span class="dx-rot">Cor dos olhos</span><div class="dx-cores">'+Object.keys(OLHOS).map(function(k){ return '<button type="button" data-cor="'+k+'" style="background:'+OLHOS[k]+'" aria-label="'+k+'" aria-pressed="'+(CFG.olhos===k)+'"></button>'; }).join('')+'</div>'+
             '<span class="dx-rot">Acabamento</span>'+seg('acab',[['claro','Claro'],['grafite','Grafite']])+
-            '<span class="dx-rot">Lado da tela</span>'+seg('lado',[['direita','Direita'],['esquerda','Esquerda']])+'</div>'+
+            '<span class="dx-rot">Lado da tela</span>'+seg('lado',[['direita','Direita'],['esquerda','Esquerda']])+
+            '<span class="dx-rot">Tema do chat</span><div class="dx-temas">'+TEMAS_CHAT.map(function(t){ return '<button type="button" class="dx-tema dx-toque" data-tc="'+t[0]+'" aria-pressed="'+(CFG.tema===t[0])+'"><i style="background:'+t[2]+'"></i>'+t[1]+'</button>'; }).join('')+'</div>'+
+            '<p class="dx-nota">Vale para o chat, o painel de consumo, o estúdio e os carregamentos.</p></div>'+
           '<div class="dx-painel" data-p="fantasias" hidden><span class="dx-rot">Temas prontos</span><div class="dx-carrossel">'+TEMAS.map(function(t,n){ return '<button type="button" class="dx-card dx-toque" data-t="'+n+'" aria-pressed="'+(n===i)+'">'+miniatura('tema',t[1])+'<span>'+t[0]+'</span></button>'; }).join('')+'</div>'+
             '<span class="dx-rot">Cabeça</span>'+grade('cab')+'<span class="dx-rot">Rosto</span>'+grade('rosto')+'<span class="dx-rot">Roupa</span>'+grade('corpo')+
             '<span class="dx-rot">Época</span><div class="dx-lista">'+sw('epoca','Fantasia da época automática','Papai Noel em dezembro e coelho na Páscoa, quando nenhuma fantasia está escolhida')+'</div></div>'+
@@ -648,7 +671,8 @@
     est.querySelectorAll('.dx-abas button').forEach(function(b){ b.onclick=function(){ trocarAbaEst(b.dataset.aba); }; });
     est.querySelectorAll('.dx-seg').forEach(function(g){ g.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ definir(g.dataset.k,b.dataset.v); marcarEstudio(true); reagir(g.dataset.k==='anim'&&b.dataset.v==='expressiva'?'comemorando':'feliz',1000); pular(); }; }); });
     est.querySelectorAll('.dx-sw').forEach(function(s){ s.onclick=function(){ var on=s.getAttribute('aria-checked')!=='true'; definir(s.dataset.k,on?'sim':'nao'); s.setAttribute('aria-checked',String(on)); reagir(on?'feliz':'surpresa',900); }; });
-    est.querySelectorAll('.dx-cores button').forEach(function(b){ b.onclick=function(){ definir('olhos',b.dataset.cor); marcarEstudio(true); M.anima(b,[{transform:'scale(.7)'},{transform:'none'}],'elastica'); reagir('amor',900); }; });
+    est.querySelectorAll('.dx-cores button').forEach(function(b){ b.onclick=function(){ definir('olhos',b.dataset.cor); marcarEstudio(true); M.anima(b,[{transform:'scale(.8)'},{transform:'none'}],'pula'); reagir('amor',900); }; });
+    est.querySelectorAll('.dx-tema').forEach(function(b){ b.onclick=function(){ definir('tema',b.dataset.tc); marcarEstudio(true); reagir('surpresa',600); setTimeout(function(){ reagir('feliz',900); },600); }; });
     est.querySelectorAll('.dx-jeito').forEach(function(b){ b.onclick=function(){ definir('jeito',b.dataset.j); marcarEstudio(true); reagir(b.dataset.j==='divertido'?'comemorando':b.dataset.j==='formal'?'surpresa':'feliz',1200); }; });
     est.querySelectorAll('.dx-grade').forEach(function(g){ g.querySelectorAll('.dx-card').forEach(function(b){ b.onclick=function(){ CFG[g.dataset.g]=b.dataset.v; salvar(); aplicarCfg(); marcarEstudio(true); estalo(b); reagir(b.dataset.v==='natal'?'comemorando':'amor',1200); pular(); }; }); });
     est.querySelectorAll('.dx-carrossel .dx-card').forEach(function(b){ b.onclick=function(){ trocarFantasiaVisual(+b.dataset.t); estalo(b); }; });
@@ -664,17 +688,20 @@
     palco.addEventListener('pointerup',fim); palco.addEventListener('pointercancel',fim);
     aplicarVisual();
   }
-  function estalo(b){ var s=b.querySelector('.dex-svg'); if(s) M.anima(s,[{transform:'scale(.75) rotate(-8deg)'},{transform:'none'}],'elastica'); }
-  /* trocar de fantasia: o Dex sai por um lado e volta pelo outro já vestido */
+  function estalo(b){ var s=b.querySelector('.dex-svg'); if(s) M.anima(s,[{transform:'scale(.82) rotate(-6deg)'},{transform:'none'}],'pula'); }
+  /* trocar de fantasia: o Dex dá meia-volta (como uma carta), troca de roupa no meio do giro e volta com mola macia */
+  var trocando=null;
   function trocarFantasiaVisual(i,dir,desde){
     var t=TEMAS[i][1], box=est&&est.querySelector('.dx-est-dex'), d=dir||1;
     var aplicar=function(){ CFG.cab=t.cab; CFG.rosto=t.rosto; CFG.corpo=t.corpo; salvar(); aplicarCfg(); marcarEstudio(true); };
     if(!box||parado()){ aplicar(); return; }
-    var sai=M.anima(box,[{transform:'translateX('+(desde||0)+'px)',opacity:1},{transform:'translateX('+(-d*160)+'px) rotate('+(-d*14)+'deg)',opacity:0}],'rapida',{fill:'forwards'});
-    var depois=function(){ aplicar(); box.style.transform=''; if(sai) sai.cancel();
-      M.anima(box,[{transform:'translateX('+(d*160)+'px) rotate('+(d*14)+'deg)',opacity:0},{transform:'none',opacity:1}],'pula'); setTimeout(function(){ reagir(t.cab==='natal'?'comemorando':'feliz',1300); pular(); },220); };
-    if(sai) sai.finished.then(depois,depois); else depois();
-    var nomeT=est.querySelector('.dx-est-tema span'); M.anima(nomeT,[{opacity:0,transform:'translateY('+(d*8)+'px)'},{opacity:1,transform:'none'}],'suave');
+    if(trocando) trocando.cancel();
+    var x0=desde||0, D1=360;
+    trocando=box.animate([{transform:'translateX('+x0+'px) scaleX(1)'},{transform:'translateX('+(x0*.4-d*26)+'px) scaleX(0) scaleY(1.04)'}],{duration:D1,easing:'cubic-bezier(.55,0,.75,.35)',fill:'forwards'});
+    trocando.finished.then(function(){ aplicar(); box.style.transform='';
+      M.anima(box,[{transform:'translateX('+(d*26)+'px) scaleX(0) scaleY(1.04)'},{transform:'none'}],'pula'); if(trocando) trocando.cancel(); trocando=null;
+      setTimeout(function(){ reagir(t.cab==='natal'?'comemorando':'feliz',1300); truque('quica',[box.querySelector('.dex-corpo')]); },120); },function(){});
+    var nomeT=est.querySelector('.dx-est-tema span'); M.anima(nomeT,[{opacity:0,transform:'translateY('+(d*10)+'px)',filter:'blur(3px)'},{opacity:1,transform:'none',filter:'none'}],'suave',{delay:D1-80,fill:'backwards'});
   }
   function marcarEstudio(animar){
     if(!est) return; var i=temaAtual();
@@ -683,17 +710,23 @@
     est.querySelectorAll('.dx-sw').forEach(function(s){ s.setAttribute('aria-checked',String(valor(s.dataset.k)==='sim')); });
     est.querySelectorAll('.dx-cores button').forEach(function(b){ b.setAttribute('aria-pressed',String(CFG.olhos===b.dataset.cor)); });
     est.querySelectorAll('.dx-jeito').forEach(function(b){ b.setAttribute('aria-pressed',String(CFG.jeito===b.dataset.j)); });
+    est.querySelectorAll('.dx-tema').forEach(function(b){ b.setAttribute('aria-pressed',String(CFG.tema===b.dataset.tc)); });
     est.querySelectorAll('.dx-grade').forEach(function(g){ g.querySelectorAll('.dx-card').forEach(function(b){ b.setAttribute('aria-pressed',String(CFG[g.dataset.g]===b.dataset.v)); }); });
     est.querySelectorAll('.dx-carrossel .dx-card').forEach(function(b){ b.setAttribute('aria-pressed',String(+b.dataset.t===i)); });
     atualizarCartao();
   }
   function trocarAbaEst(a){
-    if(!est||a===abaEst) return; var ord=ABAS.map(function(x){ return x[0]; }), dir=ord.indexOf(a)>ord.indexOf(abaEst)?1:-1; abaEst=a;
+    if(!est||a===abaEst) return; var ord=ABAS.map(function(x){ return x[0]; }), dir=ord.indexOf(a)>ord.indexOf(abaEst)?1:-1, antiga=abaEst; abaEst=a;
     est.querySelectorAll('.dx-abas button').forEach(function(b){ b.setAttribute('aria-selected',String(b.dataset.aba===a)); }); pilula(est.querySelector('.dx-abas'),true);
-    est.querySelectorAll('.dx-painel').forEach(function(p){ var on=p.dataset.p===a; p.hidden=!on;
-      if(on){ M.anima(p,[{opacity:0,transform:'translateX('+(dir*34)+'px)'},{opacity:1,transform:'none'}],'suave'); p.querySelectorAll('.dx-seg').forEach(function(g){ pilula(g,false); });
-        Array.prototype.forEach.call(p.children,function(c,k){ M.anima(c,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],'calma',{delay:k*28,fill:'backwards'}); }); } });
-    est.querySelector('.dx-paineis').scrollTop=0;
+    var box=est.querySelector('.dx-paineis'), velho=est.querySelector('.dx-painel[data-p="'+antiga+'"]'), novo=est.querySelector('.dx-painel[data-p="'+a+'"]');
+    if(velho&&!parado()){ var top=box.scrollTop; velho.classList.add('saindo'); velho.style.top=(14-top)+'px';
+      var sai=M.anima(velho,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-dir*28)+'px)'}],'rapida',{fill:'forwards'});
+      var f=function(){ velho.hidden=true; velho.classList.remove('saindo'); velho.style.top=''; if(sai) sai.cancel(); }; if(sai) sai.finished.then(f,f); else f(); }
+    else if(velho) velho.hidden=true;
+    box.scrollTop=0; novo.hidden=false;
+    M.anima(novo,[{opacity:0,transform:'translateX('+(dir*34)+'px)'},{opacity:1,transform:'none'}],'suave',{delay:40,fill:'backwards'});
+    novo.querySelectorAll('.dx-seg').forEach(function(g){ pilula(g,false); });
+    Array.prototype.forEach.call(novo.children,function(c,k){ M.anima(c,[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],'calma',{delay:60+k*24,fill:'backwards'}); });
   }
   function abrirEstudio(){
     if(!est) montarEstudio();
@@ -794,7 +827,8 @@
   function paraLocal(texto,motivo){
     if(motivo==='limite'||motivo==='rede') localAte=Date.now()+120000;
     if(!avisouLocal){ avisouLocal=true; var a=el('div','ai-msg bot dex-aviso');
-      a.textContent=motivo==='limite'?'Ufa, a IA chegou no limite por agora. Enquanto isso, respondo com o que já sei do site.':'Estou sem conexão com a IA agora. Enquanto isso, respondo com o que já sei do site.';
+      var espera=duracao(USO.ultimo&&USO.ultimo.limites&&USO.ultimo.limites.tentar_em);
+      a.textContent=motivo==='limite'?'Ufa, a IA chegou no limite por agora'+(espera?' (volta em '+quando(espera)+')':'')+'. Enquanto isso, respondo com o que já sei do site.':'Estou sem conexão com a IA agora. Enquanto isso, respondo com o que já sei do site.';
       msgs.appendChild(a); rolar(); }
     marcarModo(motivo==='limite'?'limite':'local');
     passar=true; input.value=texto;
@@ -815,7 +849,7 @@
     try{ r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagens:hist,contexto:contexto(),nome:CFG.nome,jeito:CFG.jeito,idioma:CFG.idioma}),signal:ctl.signal}); j=await r.json().catch(function(){ return null; }); }
     catch(e){ r=null; }
     clearTimeout(t); pensando(false);
-    if(j&&j.limites&&j.limites.req_limite_dia!=null){ usoDia(); USO.ultimo=Object.assign({},USO.ultimo,{limites:j.limites,quando:Date.now()}); salvarUso(); }
+    if(j&&j.limites&&(j.limites.req_limite_dia!=null||j.limites.tentar_em)){ usoDia(); USO.ultimo=Object.assign({},USO.ultimo,{limites:Object.assign({},USO.ultimo&&USO.ultimo.limites,j.limites),quando:Date.now()}); salvarUso(); }
     if(!r||!r.ok||!j||!j.texto){
       hist.pop(); u.remove(); b.remove(); reagir('triste',1400);
       var motivo=!r?'rede':((j&&j.erro)==='limite'||r.status===429)?'limite':(j&&j.erro)==='sem_chave'?'sem_chave':'rede';
@@ -852,7 +886,7 @@
   /* =================================================================== 12. INÍCIO */
   if(chat) chat.querySelectorAll('[data-prompt]').forEach(function(b){ if(/AniverCut/i.test(b.dataset.prompt)) b.dataset.prompt=b.dataset.prompt.replace(/AniverCut/gi,'AkiCut'); });
   trocarAvatares(); setTimeout(trocarAvatares,400);
-  aplicarCfg(); render(); checar();
-  W.__dex={reagir:reagir,pular:pular,truque:truque,mostrar:mostrar,tour:tour,fimGuia:fimGuia,abrirEstudio:abrirEstudio,abrirFolha:abrirFolha,falar:falarBalao,cfg:CFG,contexto:contexto,
+  aplicarCfg(); render(); checar(); setInterval(atualizarCabecalho,60000);
+  W.__dex={desenho:{inteiro:svgInteiro,aplicarVisual:aplicarVisual},reagir:reagir,pular:pular,truque:truque,mostrar:mostrar,tour:tour,fimGuia:fimGuia,abrirEstudio:abrirEstudio,abrirFolha:abrirFolha,falar:falarBalao,cfg:CFG,contexto:contexto,
     uso:function(){ return USO; },estado:function(){ return {humor:humorAtual,modo:modoIA,guia:E.guia,tour:emTour,passo:passo}; }};
 })();

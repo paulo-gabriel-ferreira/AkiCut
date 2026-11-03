@@ -7,6 +7,7 @@ O QUE TEM NESTA PASTA
   assets/motion.js            o movimento do site (molas estilo Apple) usado também pelo Dex
   dex/dex.css                 o visual do Dex, do chat, do painel de consumo e do Estúdio
   dex/dex.js                  o Dex: personagem, chat, guia na tela, tour e Estúdio
+  dex/dex-cargas.js           as telas de carregamento do Dex (envelope do ZIP e pintor das artes)
   api/dex.js                  a função que conversa com a IA (roda no Vercel, a chave fica escondida)
   api/_dex-conhecimento.js    tudo o que o Dex sabe sobre o site
 
@@ -25,7 +26,7 @@ PASSO 1 · Colocar a chave da IA no Vercel (só uma vez)
 
 PASSO 2 · Enviar os arquivos
   Se o projeto está ligado ao GitHub:
-    substitua o index.html, adicione o dex.js e a pasta api, faça o commit. O Vercel publica sozinho.
+    substitua o index.html, adicione as pastas assets, dex e api, faça o commit. O Vercel publica sozinho.
   Se você publica pelo computador (Vercel CLI):
     copie os arquivos para a pasta do projeto e rode: vercel --prod
 
@@ -55,7 +56,7 @@ PRIVACIDADE
 
 PERSONALIZAR O DEX
   Ajustes (engrenagem do menu) → cartão "Estúdio do Dex", ou a engrenagem no topo do chat.
-  Abas: Visual (tamanho, olhos, acabamento, lado) · Fantasias (temas, cabeça, rosto, roupa e época;
+  Abas: Visual (tema do chat: Noite, Grafite, Névoa ou Automático; tamanho, olhos, acabamento, lado) · Fantasias (temas, cabeça, rosto, roupa e época;
   dá para arrastar o Dex para os lados para trocar) · Conversa (jeito e idioma) · Jeito (animações,
   truques, olhar, balões, mostrar/ocultar e modo leve). Fica salvo no navegador de cada pessoa.
 
@@ -65,8 +66,18 @@ MUDAR O JEITO DE FALAR (mais a fundo)
 
 CONSUMO DA IA
   No chat, toque no anel ao lado da engrenagem: abre o painel "Meu consumo", com a cota diária da
-  equipe, as suas perguntas e tokens de hoje, o tempo médio e o fôlego por minuto.
+  equipe, quando ela fica cheia de novo, as suas perguntas e tokens de hoje, a resposta média
+  e o fôlego por minuto.
   Também dá para digitar /status ou perguntar "quanto você consumiu hoje?" (não gasta IA).
+
+CARREGAMENTOS
+  Ao montar o ZIP, o Dex coloca papeizinhos num envelope amarelo, com a porcentagem real.
+  Ao gerar as artes, ele pinta um quadro de bigode e pincel. Os dois são pequenos e leves.
+
+NOME AKICUT
+  Tudo que aparece na tela agora diz AkiCut. Por dentro, o bucket do Supabase ('anivercut') e as
+  chaves salvas no navegador continuam com o nome antigo de propósito: assim nenhum dado se perde.
+  Não renomeie o bucket.
 
 GUIA NA TELA
   Pergunte "onde fica importar lista?" e o Dex voa até o botão e aponta com o braço.

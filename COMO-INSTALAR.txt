@@ -5,9 +5,10 @@ O QUE TEM NESTA PASTA
   index.html                  o site
   assets/motion.css           logo AkiCut, desempenho e modo leve
   assets/motion.js            o movimento do site (molas estilo Apple) usado também pelo Dex
+  assets/visual.css           o visual profissional (grafite e cinzas; as cores da Akiyama ficam só no "Aki")
   dex/dex.css                 o visual do Dex, do chat, do painel de consumo e do Estúdio
   dex/dex.js                  o Dex: personagem, chat, guia na tela, tour e Estúdio
-  dex/dex-cargas.js           as telas de carregamento do Dex (envelope do ZIP e pintor das artes)
+  dex/dex-cargas.js           as telas de carregamento do Dex (pintor, envelope do ZIP, foto e relatório)
   api/dex.js                  a função que conversa com a IA (roda no Vercel, a chave fica escondida)
   api/_dex-conhecimento.js    tudo o que o Dex sabe sobre o site
 
@@ -50,7 +51,9 @@ LIMITES (plano gratuito do Groq)
 
 PRIVACIDADE
   O Dex manda para a IA só a pergunta, as últimas mensagens da conversa e números gerais
-  (quantos aniversariantes, fotos etc.). Não manda fotos nem a lista de nomes do cadastro.
+  (quantos aniversariantes, fotos etc.). Quando a pergunta cita alguém, vai junto só a ficha
+  dessa pessoa (nome, aniversário, quantas fotos e status da arte). Nunca manda fotos nem o
+  cadastro inteiro. Perguntas como "quem é a Ana?" nem chegam à IA: o próprio site responde.
   Mesmo assim, evite digitar dados pessoais sensíveis no chat.
 
 
@@ -71,8 +74,18 @@ CONSUMO DA IA
   Também dá para digitar /status ou perguntar "quanto você consumiu hoje?" (não gasta IA).
 
 CARREGAMENTOS
-  Ao montar o ZIP, o Dex coloca papeizinhos num envelope amarelo, com a porcentagem real.
-  Ao gerar as artes, ele pinta um quadro de bigode e pincel. Os dois são pequenos e leves.
+  Ficam no meio da tela, com o Dex trabalhando de verdade (cada gesto é decidido na hora,
+  sem animação repetida) e a porcentagem real:
+    Gerar artes ........ ele pinta um quadro, de boina e bigode, e molha o pincel na paleta
+    Montar o ZIP ....... ele pega papéis da pilha, joga ou leva até o envelope amarelo e fecha
+    Abrir uma foto/arte  ele sacode uma foto instantânea enquanto ela revela
+    Outros ............. ele escreve e confere um relatório
+
+BUSCAR PESSOAS
+  Pergunte no chat "quem é a Ana Souza?", "aniversário do Bruno", "fotos da Carla" ou
+  "aniversariantes de março". O Dex acha a pessoa mesmo sem acento, só com o primeiro nome ou
+  com grafia parecida, e mostra a ficha: aniversário e quantos dias faltam, fotos, melhor nota
+  e status da arte, com botões para abrir o cadastro ou a arte.
 
 NOME AKICUT
   Tudo que aparece na tela agora diz AkiCut. Por dentro, o bucket do Supabase ('anivercut') e as

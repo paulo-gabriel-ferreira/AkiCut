@@ -691,17 +691,39 @@
   function estalo(b){ var s=b.querySelector('.dex-svg'); if(s) M.anima(s,[{transform:'scale(.82) rotate(-6deg)'},{transform:'none'}],'pula'); }
   /* trocar de fantasia: o Dex dá meia-volta (como uma carta), troca de roupa no meio do giro e volta com mola macia */
   var trocando=null;
+  /* troca de roupa: ele toma impulso, pula, a roupa antiga se dissolve no ar e ele aterrissa com a nova */
+  var trocaFantasma=null, trocaTimer=0;
   function trocarFantasiaVisual(i,dir,desde){
     var t=TEMAS[i][1], box=est&&est.querySelector('.dx-est-dex'), d=dir||1;
     var aplicar=function(){ CFG.cab=t.cab; CFG.rosto=t.rosto; CFG.corpo=t.corpo; salvar(); aplicarCfg(); marcarEstudio(true); };
-    if(!box||parado()){ aplicar(); return; }
-    if(trocando) trocando.cancel();
-    var x0=desde||0, D1=360;
-    trocando=box.animate([{transform:'translateX('+x0+'px) scaleX(1)'},{transform:'translateX('+(x0*.4-d*26)+'px) scaleX(0) scaleY(1.04)'}],{duration:D1,easing:'cubic-bezier(.55,0,.75,.35)',fill:'forwards'});
-    trocando.finished.then(function(){ aplicar(); box.style.transform='';
-      M.anima(box,[{transform:'translateX('+(d*26)+'px) scaleX(0) scaleY(1.04)'},{transform:'none'}],'pula'); if(trocando) trocando.cancel(); trocando=null;
-      setTimeout(function(){ reagir(t.cab==='natal'?'comemorando':'feliz',1300); truque('quica',[box.querySelector('.dex-corpo')]); },120); },function(){});
-    var nomeT=est.querySelector('.dx-est-tema span'); M.anima(nomeT,[{opacity:0,transform:'translateY('+(d*10)+'px)',filter:'blur(3px)'},{opacity:1,transform:'none',filter:'none'}],'suave',{delay:D1-80,fill:'backwards'});
+    var corpoEl=box&&box.querySelector('.dex-corpo');
+    if(!box||!corpoEl||parado()){ aplicar(); return; }
+    if(trocando) trocando.cancel(); if(trocaFantasma) trocaFantasma.remove();
+    var x0=desde||0, X=function(f){ return 'translateX('+Math.round(x0*f)+'px) '; };
+    trocando=box.animate([
+      {transform:X(1)+'none',easing:'cubic-bezier(.3,0,.5,1)'},
+      {offset:.16,transform:X(.8)+'translateY(5px) scale(1.07,.9)',easing:'cubic-bezier(.2,.7,.3,1)'},
+      {offset:.46,transform:X(.35)+'translateY(-24px) scale(.95,1.06) rotate('+(d*4)+'deg)',easing:'cubic-bezier(.5,0,.7,.4)'},
+      {offset:.68,transform:X(.1)+'translateY(3px) scale(1.06,.93)',easing:'cubic-bezier(.3,.7,.4,1)'},
+      {offset:.84,transform:X(0)+'translateY(-3px) scale(.99,1.015)',easing:'ease-in-out'},
+      {transform:'none'}],{duration:860});
+    trocando.finished.then(function(){ trocando=null; },function(){});
+    clearTimeout(trocaTimer); trocaTimer=setTimeout(function(){
+    /* cópia com a roupa atual, no mesmo passo da flutuação do original */
+    var velho=corpoEl.cloneNode(true), sv=corpoEl.querySelector('.dex-svg'), attrs={cab:sv.getAttribute('data-cab'),rosto:sv.getAttribute('data-rosto'),corpo:sv.getAttribute('data-corpo')};
+    velho.classList.add('dx-roupa-velha'); velho.setAttribute('aria-hidden','true'); [].forEach.call(velho.querySelectorAll('.dex-svg'),function(x){ x.classList.add('dex-thumb'); x.classList.remove('dex-prev'); }); box.appendChild(velho); trocaFantasma=velho;
+    var o1=[corpoEl].concat([].slice.call(corpoEl.querySelectorAll('*'))), o2=[velho].concat([].slice.call(velho.querySelectorAll('*')));
+    o1.forEach(function(e,k){ var a1=e.getAnimations?e.getAnimations():[], a2=o2[k]&&o2[k].getAnimations?o2[k].getAnimations():[]; a2.forEach(function(an,j){ if(a1[j]) an.currentTime=a1[j].currentTime; }); });
+    aplicar();
+    var sv2=velho.querySelector('.dex-svg'); sv2.setAttribute('data-cab',attrs.cab); sv2.setAttribute('data-rosto',attrs.rosto); sv2.setAttribute('data-corpo',attrs.corpo);
+    /* a roupa velha some no alto do pulo, com um brilho suave */
+    var some=velho.animate([{opacity:1,filter:'blur(0)',transform:'scale(1)'},{opacity:0,filter:'blur(3px)',transform:'scale(1.05) translateY(-4px)'}],{duration:300,delay:0,easing:'cubic-bezier(.4,0,.6,1)',fill:'both'});
+    some.finished.then(function(){ velho.remove(); if(trocaFantasma===velho) trocaFantasma=null; },function(){ velho.remove(); });
+    var luz=document.createElement('i'); luz.className='dx-troca-luz'; box.appendChild(luz);
+    luz.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.5)'},{opacity:.9,offset:.35},{opacity:0,transform:'translate(-50%,-50%) scale(1.35)'}],{duration:620,delay:0,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}).finished.then(function(){ luz.remove(); },function(){ luz.remove(); });
+    },240);
+    setTimeout(function(){ reagir(t.cab==='natal'?'comemorando':'feliz',1300); },560);
+    var nomeT=est.querySelector('.dx-est-tema span'); M.anima(nomeT,[{opacity:0,transform:'translateY('+(d*10)+'px)',filter:'blur(3px)'},{opacity:1,transform:'none',filter:'none'}],'suave',{delay:260,fill:'backwards'});
   }
   function marcarEstudio(animar){
     if(!est) return; var i=temaAtual();
@@ -749,6 +771,147 @@
   })();
   W.__dexEditor=abrirEstudio;
 
+  /* =================================================================== 11b. PESSOAS: busca precisa e ficha do colaborador */
+  /* Acha nomes dentro da frase (com ou sem acento, nome parcial, grafia parecida) usando as
+     mesmas regras do app: sobrenome diferente é outra pessoa; só o primeiro nome é parcial. */
+  var PARADAS=new Set(('a o e de da do das dos di du em no na nos nas um uma uns umas que quem qual quais quando onde como sobre pra para por com sem ao aos me '+
+    'te se eu voce vc voces ele ela eles elas isso esse essa este esta tem ter teve faz fez sao sou ser foi vai vou dar mostra mostre mostrar abre abrir abra fala fale diga diz '+
+    'info infos informacao informacoes dados ficha cadastro cadastrado cadastrada colaborador colaboradora colaboradores pessoa pessoas aniversario aniversarios aniversariante '+
+    'niver data dia mes foto fotos arte artes ja ainda hoje amanha ta procura procure procurar busca busque buscar buscando acha ache achar encontra encontre encontrar quero queria '+
+    'saber sabe preciso pode poderia favor obrigado obrigada oi ola dex sim nao tudo todo toda nome sobrenome status situacao gerar gerada gerado pronta pronto mais menos ver veja '+
+    'lista listar quantas quantos qual seu sua dele dela meu minha nosso nossa ou tambem entao aqui ali la isso dela dele perfil detalhes contar conta conte '+
+    'proximo proxima proximos proximas ultimo ultima primeiro primeira semana ano novo nova novos novas '+
+    'busco procuro acho encontro como funciona fica faco faz fazer importar importo usar uso posso consigo devo existe certo errado ok legal valeu bom boa tarde noite dia').split(' '));
+  function normalizar(t){ return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+  function pedacos(texto){
+    var w=normalizar(texto).replace(/[^a-z\s'-]/g,' ').split(/\s+/).filter(Boolean), grupos=[], g=[];
+    w.forEach(function(x){ if(PARADAS.has(x)||x.length<2){ if(g.length) grupos.push(g); g=[]; } else g.push(x); });
+    if(g.length) grupos.push(g);
+    /* "Ana de Souza": a partícula no meio do nome não quebra o grupo */
+    var partes=normalizar(texto).replace(/[^a-z\s'-]/g,' ').split(/\s+/).filter(Boolean), c=[];
+    for(var i=0;i<partes.length;i++){ if(!PARADAS.has(partes[i])&&partes[i].length>1){ var j=i, nome=[partes[i]]; while(j+2<partes.length&&/^(de|da|do|dos|das|e)$/.test(partes[j+1])&&!PARADAS.has(partes[j+2])){ nome.push(partes[j+1],partes[j+2]); j+=2; } if(nome.length>1) c.push(nome); } }
+    var cands=[]; grupos.concat(c).forEach(function(g){ for(var a=0;a<g.length;a++) for(var b=a+1;b<=Math.min(g.length,a+5);b++) cands.push(g.slice(a,b).join(' ')); });
+    return cands.filter(function(x,i,l){ return l.indexOf(x)===i; });
+  }
+  function entradasDe(p){
+    var out=[]; num(function(){ Object.keys(state.months).forEach(function(k){ var rec=state.months[k]; (rec.entries||[]).forEach(function(e){
+      if(p.id&&e.personId===p.id) out.push({k:k,e:e}); else if(!e.personId&&compararNomes(e.name,p.name).score>=.84) out.push({k:k,e:e}); }); }); });
+    return out;
+  }
+  function buscarPessoas(texto){
+    var cands=pedacos(texto), achados={};
+    if(!cands.length) return {cands:cands,lista:[]};
+    num(function(){
+      cands.forEach(function(c){
+        var palavras=c.split(' ').length;
+        state.people.forEach(function(p){ var r=compararNomes(c,p.name); if(r.score>0){ var sc=r.score+palavras*.05; if(!achados[p.id]||achados[p.id].score<sc) achados[p.id]={p:p,score:sc,tipo:r.tipo,termo:c}; } });
+        /* aniversariantes que estão só na lista do mês (sem cadastro) */
+        Object.keys(state.months).forEach(function(k){ (state.months[k].entries||[]).forEach(function(e){ if(e.personId) return; var r=compararNomes(c,e.name); if(r.score>0){ var id='lista:'+normalizar(e.name); var sc=r.score+palavras*.05; if(!achados[id]||achados[id].score<sc) achados[id]={p:{id:null,name:e.name,soLista:true},score:sc,tipo:r.tipo,termo:c}; } }); });
+      });
+    });
+    var lista=Object.keys(achados).map(function(k){ return achados[k]; }).sort(function(a,b){ return b.score-a.score; });
+    /* fica com quem bateu melhor (mais palavras e mais parecido); empates viram pergunta "qual delas?" */
+    if(lista.length){ var top=lista[0].score; lista=lista.filter(function(x){ return x.score>=top-.03; }); }
+    return {cands:cands,lista:lista.slice(0,6)};
+  }
+  /* nomes parecidos quando nada bate (erro de digitação no primeiro nome) */
+  function parecidos(cands){
+    var out=[]; num(function(){
+      var ts=[]; cands.forEach(function(c){ c.split(' ').forEach(function(t){ if(t.length>2&&ts.indexOf(t)<0) ts.push(t); }); });
+      state.people.forEach(function(p){ var nt=nomeTokens(p.name), m=0; ts.forEach(function(t){ nt.forEach(function(u){ var c=_compat(t,u); if(c>m) m=c; }); }); if(m>=.66) out.push({p:p,m:m}); });
+    });
+    return out.sort(function(a,b){ return b.m-a.m; }).slice(0,4).map(function(x){ return x.p; });
+  }
+  var MES_CURTO=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  function diasAte(d,m){ var h=new Date(); h.setHours(0,0,0,0); var a=new Date(h.getFullYear(),m-1,d); if(a<h) a=new Date(h.getFullYear()+1,m-1,d); return Math.round((a-h)/86400000); }
+  function ficha(p){
+    var f={nome:p.name,cadastrado:!p.soLista};
+    if(!p.soLista){ var fs=num(function(){ return state.photos[p.id]||[]; })||[]; f.fotos=fs.length; var notas=fs.map(function(x){ return x.analysis&&x.analysis.score||0; }).filter(Boolean); if(notas.length) f.melhor_nota=Math.max.apply(null,notas); f.thumb=(fs.find(function(x){ return x.thumb; })||{}).thumb||null; }
+    var en=p.soLista?[]:entradasDe(p);
+    if(p.soLista) num(function(){ Object.keys(state.months).forEach(function(k){ (state.months[k].entries||[]).forEach(function(e){ if(!e.personId&&normalizar(e.name)===normalizar(p.name)) en.push({k:k,e:e}); }); }); });
+    en.sort(function(a,b){ return a.k<b.k?1:-1; });
+    if(en.length){
+      var e=en[0].e, st=num(function(){ return catalogStatus(e); });
+      f.aniversario=String(e.day).padStart(2,'0')+' de '+MESNOME[e.month-1].toLowerCase(); f.dia=e.day; f.mes=e.month; f.faltam_dias=diasAte(e.day,e.month);
+      f.lista=en[0].k; f.entrada=e.id;
+      f.arte=e.status==='ready'?'gerada':st==='ready'?'pronta para gerar':st==='review'?'precisa conferir o vínculo':'sem foto ou sem cadastro';
+      if(e.msg) f.aviso=e.msg;
+    }
+    return f;
+  }
+  function fichaIA(f){ var o={}; ['nome','cadastrado','fotos','melhor_nota','aniversario','faltam_dias','arte','aviso'].forEach(function(k){ if(f[k]!=null) o[k]=f[k]; }); return o; }
+  function iniciais(n){ return String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(function(w){ return w[0]; }).join('').toUpperCase(); }
+  function cartaoPessoa(p,caixa){
+    var f=ficha(p), c=el('div','dx-pessoa');
+    var falta=f.faltam_dias==null?'':f.faltam_dias===0?' · é hoje!':f.faltam_dias===1?' · amanhã':' · em '+f.faltam_dias+' dias';
+    var linhas=[];
+    linhas.push(['Aniversário',f.aniversario?f.aniversario+falta:'não está em nenhuma lista']);
+    if(f.cadastrado) linhas.push(['Fotos',f.fotos?f.fotos+(f.fotos>1?' fotos':' foto')+(f.melhor_nota?' · melhor nota '+f.melhor_nota:''):'nenhuma foto ainda']);
+    else linhas.push(['Cadastro','só na lista do mês, sem cadastro']);
+    if(f.arte) linhas.push(['Arte',f.arte]);
+    var cls=f.arte==='gerada'||f.arte==='pronta para gerar'?'ok':f.arte&&/conferir/.test(f.arte)?'conf':'falta';
+    c.innerHTML='<div class="dx-pessoa-topo"><span class="dx-pessoa-ava">'+esc(iniciais(f.nome))+(f.thumb?'<img src="'+esc(f.thumb)+'" alt="">':'')+'</span>'+
+      '<div class="dx-pessoa-nome"><b>'+esc(f.nome)+'</b><small>'+(f.cadastrado?'Colaborador cadastrado':'Aniversariante sem cadastro')+'</small></div>'+
+      (f.arte?'<i class="dx-pessoa-st '+cls+'" title="'+esc(f.arte)+'"></i>':'')+'</div>'+
+      '<dl class="dx-pessoa-dados">'+linhas.map(function(l){ return '<div><dt>'+esc(l[0])+'</dt><dd>'+esc(l[1])+'</dd></div>'; }).join('')+'</dl>';
+    var bt=el('div','ak-btns');
+    if(f.cadastrado&&typeof W.personDialog==='function'){ var a=el('button','ak-btn pri','Abrir cadastro'); a.type='button'; a.onclick=function(){ num(function(){ W.setTab('colab'); }); setTimeout(function(){ W.personDialog(p.id); },250); }; bt.appendChild(a); }
+    if(f.entrada&&typeof W.openArt==='function'){ var b=el('button','ak-btn'+(bt.children.length?'':' pri'),'Abrir a arte'); b.type='button'; b.onclick=function(){ num(function(){ var y=+f.lista.slice(0,4), m=+f.lista.slice(5,7); state.year=y; state.month=m; W.openArt(f.entrada); }); }; bt.appendChild(b); }
+    if(bt.children.length) c.appendChild(bt);
+    (caixa||msgs).appendChild(c);
+    if(!parado()) M.anima(c,[{opacity:0,transform:'translateY(10px) scale(.97)'},{opacity:1,transform:'none'}],'pula',{delay:120,fill:'backwards'});
+    rolar(); return f;
+  }
+  function falaBot(html){ var b=el('div','ai-msg bot dex-ia'); b.innerHTML='<div class="dex-txt">'+html+'</div>'; msgs.appendChild(b); rolar(); return b; }
+  function falaUser(t){ var u=el('div','ai-msg user'); u.textContent=t; msgs.appendChild(u); }
+  function escolherPessoa(lista,b){
+    var g=el('div','ak-btns'); lista.forEach(function(x){ var p=x.p||x, k=el('button','ak-btn',esc(p.name)); k.type='button'; k.onclick=function(){ falaUser(p.name); var r=falaBot(CFG.jeito==='formal'?'Aqui está o cadastro:':'Prontinho, olha a ficha:'); cartaoPessoa(p,r); reagir('feliz',900); }; g.appendChild(k); });
+    b.appendChild(g); rolar();
+  }
+  var RE_PESSOA=/\b(quem e|quem eh|info|informac|dados d|ficha|cadastro d|aniversario d|niver d|quando (e|eh|faz) o aniversario|fotos? d[aoe]s?\b|tem foto|busca|buscar|procur|ach[aeo]|encontr|fala (d|s)obre|me conta|sobre (o|a)\b|mostra (o|a)\b|status d|situacao d|perfil)/;
+  var RE_PESSOA_FORTE=/\b(quem e|quem eh|info|informac|dados d|ficha|cadastro d|aniversario d|niver d|quando (e|eh|faz) o aniversario|fotos? d[aoe]s?\b|status d|situacao d|perfil|sobre (o|a)\b)/;
+  var MESES_RE='janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro';
+  var RE_LISTA_MES=new RegExp('(aniversariantes?|aniversario|niver|quem faz).*\\b('+MESES_RE+')\\b|\\b('+MESES_RE+')\\b.*(aniversariantes?|aniversario|niver)');
+  /* responde no próprio site, sem gastar IA, quando a pergunta é sobre uma pessoa ou um mês */
+  function responderLocal(t){
+    var n=normalizar(t), m=n.match(RE_LISTA_MES);
+    if(m&&!/\bgera|\bzip|\bbaix/.test(n)){
+      var nomeMes=m[2]||m[3], mi=MESES_RE.split('|').indexOf(nomeMes)+1, ano=num(function(){ return state.year; })||new Date().getFullYear();
+      var rec=num(function(){ return state.months[mk(ano,mi)]; }), es=(rec&&rec.entries||[]).slice().sort(function(a,b){ return a.day-b.day; });
+      falaUser(t);
+      if(!es.length){ falaBot('Ainda não há lista de <b>'+esc(MESNOME[mi-1])+' de '+ano+'</b>. Dá para importar em Aniversariantes → Importar lista.'); reagir('pensando',900); return true; }
+      var b=falaBot('<b>'+esc(MESNOME[mi-1])+' de '+ano+'</b>: '+es.length+(es.length>1?' aniversariantes':' aniversariante')+'. Toque em um nome para ver a ficha.');
+      var l=el('div','dx-lista-mes'); es.slice(0,40).forEach(function(e){ var st=num(function(){ return catalogStatus(e); }), i=el('button','dx-lm-item','<span>'+String(e.day).padStart(2,'0')+'</span><b>'+esc(e.name)+'</b><i class="dx-pessoa-st '+(e.status==='ready'||st==='ready'?'ok':st==='review'?'conf':'falta')+'"></i>'); i.type='button';
+        i.onclick=function(){ var p=e.personId&&num(function(){ return state.people.find(function(x){ return x.id===e.personId; }); }); var r=falaBot('Ficha de <b>'+esc(e.name)+'</b>:'); cartaoPessoa(p||{id:null,name:e.name,soLista:true},r); }; l.appendChild(i); });
+      b.appendChild(l); rolar(); reagir('feliz',900); return true;
+    }
+    if(!RE_PESSOA.test(n)) return false;
+    var r=buscarPessoas(t);
+    if(!r.cands.length) return false;
+    falaUser(t);
+    if(r.lista.length===1){ var b1=falaBot(CFG.jeito==='formal'?'Encontrei este cadastro:':(Math.random()<.5?'Achei! Aqui está a ficha:':'Bip! Encontrei. Olha só:')); cartaoPessoa(r.lista[0].p,b1); reagir('feliz',1100); return true; }
+    if(r.lista.length>1){ var b2=falaBot('Encontrei '+r.lista.length+' pessoas que combinam. Qual delas?'); escolherPessoa(r.lista,b2); reagir('pensando',1100); return true; }
+    var pr=parecidos(r.cands);
+    if(!RE_PESSOA_FORTE.test(n)&&!pr.length){ msgs.lastChild&&msgs.lastChild.classList.contains('user')&&msgs.lastChild.remove(); return false; }
+    var b3=falaBot('Não encontrei ninguém com esse nome no cadastro nem nas listas dos meses.'+(pr.length?' Talvez seja uma destas pessoas:':' Confira a grafia ou procure em Colaboradores.'));
+    if(pr.length) escolherPessoa(pr,b3); reagir('triste',1000); return true;
+  }
+  function responderLocalMes(nomeMes,caixa){
+    var mi=MESES_RE.split('|').indexOf(normalizar(nomeMes).trim())+1; if(!mi) return;
+    var ano=num(function(){ return state.year; })||new Date().getFullYear(), rec=num(function(){ return state.months[mk(ano,mi)]; }), es=(rec&&rec.entries||[]).slice().sort(function(a,b){ return a.day-b.day; });
+    if(!es.length) return; var l=el('div','dx-lista-mes');
+    es.slice(0,40).forEach(function(e){ var i=el('button','dx-lm-item','<span>'+String(e.day).padStart(2,'0')+'</span><b>'+esc(e.name)+'</b>'); i.type='button'; i.onclick=function(){ var p=e.personId&&num(function(){ return state.people.find(function(x){ return x.id===e.personId; }); }); var r=falaBot('Ficha de <b>'+esc(e.name)+'</b>:'); cartaoPessoa(p||{id:null,name:e.name,soLista:true},r); }; l.appendChild(i); });
+    caixa.appendChild(l); rolar();
+  }
+  /* para a IA: fichas reais das pessoas citadas na pergunta (só delas) */
+  function pessoasPara(t){
+    var r=buscarPessoas(t), o={};
+    if(r.lista.length) o.pessoas_encontradas=r.lista.map(function(x){ return fichaIA(ficha(x.p)); });
+    else if(r.cands.length&&RE_PESSOA.test(normalizar(t))){ o.busca_sem_resultado=true; var pr=parecidos(r.cands); if(pr.length) o.nomes_parecidos=pr.map(function(p){ return p.name; }); }
+    if(/aniversari|niver|quem|lista|mes/.test(normalizar(t))) num(function(){ var rec=state.months[mk(state.year,state.month)]; if(rec&&rec.entries.length) o.aniversariantes_do_mes_aberto=rec.entries.slice().sort(function(a,b){ return a.day-b.day; }).slice(0,40).map(function(e){ return String(e.day).padStart(2,'0')+' '+e.name; }); });
+    return o;
+  }
+
   /* =================================================================== 11. CONVERSA COM A IA */
   function marcarModo(m){ modoIA=m; atualizarCabecalho(); }
   function checar(){
@@ -757,7 +920,7 @@
       .then(function(j){ INFO=j||{}; if(j&&j.ia){ localAte=0; marcarModo('ia'); } else { localAte=Infinity; marcarModo('local'); } })
       .catch(function(){ localAte=Infinity; marcarModo('local'); });
   }
-  function contexto(){
+  function contexto(texto){
     var c={};
     try{
       c.aba=({inicio:'Início',aniv:'Aniversariantes',arte:'Arte',colab:'Colaboradores',novos:'Novos colaboradores'})[state.tab]||state.tab;
@@ -770,6 +933,7 @@
       c.fotos_a_confirmar=num(function(){ return Array.from(MEM.photos.values()).filter(function(f){ return f.personId===PENDING; }).length; });
       c.arte_aberta=num(function(){ return typeof curEntry!=='undefined'&&!!curEntry; });
       c.tema=H.getAttribute('data-theme')||'automático'; c.fantasia_do_dex=visual();
+      if(texto) Object.assign(c,pessoasPara(texto));
     }catch(e){}
     return c;
   }
@@ -810,6 +974,9 @@
         case 'confirmar': rodarComando('fotos a confirmar'); break;    case 'sem_foto': rodarAcao('semFoto'); break;
         case 'buscar': if(arg) rodarComando('buscar '+arg); break;     case 'arte': if(arg) rodarComando('abrir arte da '+arg); break;
         case 'ir_mes': if(arg) rodarComando('ir para '+arg); break;
+        case 'pessoa': if(arg&&caixa){ var rp=buscarPessoas(arg); if(rp.lista.length===1) cartaoPessoa(rp.lista[0].p,caixa); else if(rp.lista.length>1) escolherPessoa(rp.lista,caixa); } break;
+        case 'abrir_cadastro': if(arg){ var rc=buscarPessoas(arg); if(rc.lista.length===1&&rc.lista[0].p.id&&typeof W.personDialog==='function'){ var pc=rc.lista[0].p; botoes.push({t:'Abrir o cadastro de '+pc.name.split(' ')[0],fn:function(){ num(function(){ W.setTab('colab'); }); setTimeout(function(){ W.personDialog(pc.id); },250); }}); } } break;
+        case 'lista_mes': if(arg){ responderLocalMes(arg,caixa); } break;
         case 'gerar_mes': rodarComando('gerar o mês de '+(arg||num(function(){ return MESNOME[state.month-1]; })||'')); break;
         case 'gerar_arte': if(arg) botoes.push({t:'Gerar a arte de '+arg,fn:function(){ rodarComando('gerar arte da '+arg); }}); break;
         case 'editar_dex': botoes.push({t:'Abrir o Estúdio do Dex',fn:abrirEstudio}); break;
@@ -846,7 +1013,7 @@
     var b=el('div','ai-msg bot dex-ia dex-carregando'), txt=el('div','dex-txt','<span class="dex-pontos"><i></i><i></i><i></i></span>'); b.appendChild(txt); msgs.appendChild(b); rolar();
     hist.push({role:'user',content:texto}); if(hist.length>12) hist=hist.slice(-12);
     var ctl=new AbortController(), t=setTimeout(function(){ ctl.abort(); },26000), r=null, j=null;
-    try{ r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagens:hist,contexto:contexto(),nome:CFG.nome,jeito:CFG.jeito,idioma:CFG.idioma}),signal:ctl.signal}); j=await r.json().catch(function(){ return null; }); }
+    try{ r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagens:hist,contexto:contexto(texto),nome:CFG.nome,jeito:CFG.jeito,idioma:CFG.idioma}),signal:ctl.signal}); j=await r.json().catch(function(){ return null; }); }
     catch(e){ r=null; }
     clearTimeout(t); pensando(false);
     if(j&&j.limites&&(j.limites.req_limite_dia!=null||j.limites.tentar_em)){ usoDia(); USO.ultimo=Object.assign({},USO.ultimo,{limites:Object.assign({},USO.ultimo&&USO.ultimo.limites,j.limites),quando:Date.now()}); salvarUso(); }
@@ -878,9 +1045,22 @@
       else cartaoStatus();
       return;
     }
-    if(t.charAt(0)==='/'||Date.now()<localAte) return;
+    if(t.charAt(0)==='/') return;
+    if(Date.now()<localAte) return;
     viuDex=true; ev.preventDefault(); ev.stopImmediatePropagation(); input.value=''; form.classList.remove('tem-texto');
     if(!ocupado) perguntarIA(t);
+  },true);
+
+  /* pessoas e listas de mês: respondidas antes de tudo (no window, fase de captura), com a busca precisa do Dex */
+  W.addEventListener('submit',function(ev){
+    if(ev.target!==form||passar||comando||ocupado) return;
+    var t=(input.value||'').trim(); if(!t||t.charAt(0)==='/') return;
+    if(!num(function(){ return state&&state.people; })) return;
+    var ok=false; try{ ok=responderLocal(t); }catch(e){ ok=false; }
+    if(!ok) return;
+    viuDex=true; ev.preventDefault(); ev.stopImmediatePropagation(); input.value=''; form.classList.remove('tem-texto');
+    usoDia(); USO.locais=(USO.locais||0)+1; salvarUso();
+    hist.push({role:'user',content:t},{role:'assistant',content:'(mostrei no chat a ficha ou a lista pedida)'}); if(hist.length>12) hist=hist.slice(-12);
   },true);
 
   /* =================================================================== 12. INÍCIO */

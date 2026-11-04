@@ -14,7 +14,8 @@ const MODELOS_GROQ = (process.env.DEX_MODELOS_GROQ || 'openai/gpt-oss-120b,qwen/
 const MODELOS_OR = (process.env.DEX_MODELOS_OR || 'thinkingmachines/inkling-small:free,nvidia/nemotron-3-ultra-550b-a55b:free').split(',').map(s => s.trim()).filter(Boolean);
 
 const ACOES = new Set(['tour', 'aba', 'resumo', 'pendencias', 'hoje', 'semana', 'mes30', 'espaco', 'confirmar', 'buscar', 'arte', 'gerar_mes', 'gerar_arte', 'ir_mes',
-  'importar_lista', 'importar_fotos', 'unificar', 'sem_foto', 'ajustar', 'chapeleiro', 'zip', 'preparar', 'configuracoes', 'tema', 'editar_dex']);
+  'importar_lista', 'importar_fotos', 'unificar', 'sem_foto', 'ajustar', 'chapeleiro', 'zip', 'preparar', 'configuracoes', 'tema', 'editar_dex',
+  'pessoa', 'abrir_cadastro', 'lista_mes']);
 
 /* limite simples por visitante, para proteger a cota gratuita */
 const visitas = new Map();
@@ -53,7 +54,7 @@ TRECHOS DO MANUAL QUE PODEM AJUDAR
 ${trechosPara(pergunta) || '- (nenhum trecho específico; use o resumo acima)'}
 
 SITUAÇÃO ATUAL DA TELA (dados reais do app)
-${JSON.stringify(contexto || {})}
+${JSON.stringify(contexto || {}).slice(0, 6000)}
 
 AÇÕES
 Você pode pedir ao site para fazer algo colocando, no FIM da resposta, uma ou mais marcas exatas (o usuário não vê as marcas):
@@ -64,6 +65,8 @@ Você pode pedir ao site para fazer algo colocando, no FIM da resposta, uma ou m
 [[acao:ir_mes:MES]] abrir um mês (ex.: novembro) · [[acao:gerar_mes:MES]] gerar as artes de um mês (o site pede confirmação)
 [[acao:importar_lista]] [[acao:importar_fotos]] [[acao:unificar]] [[acao:ajustar]] [[acao:chapeleiro]] [[acao:zip]] [[acao:preparar]] [[acao:configuracoes]] [[acao:tema]] [[acao:editar_dex]] · viram um botão para o usuário confirmar
 [[acao:tour]] faz um tour guiado pelo site (você voa pela tela apontando as partes principais)
+[[acao:pessoa:NOME COMPLETO]] mostra a ficha da pessoa no chat (foto, aniversário, fotos, status da arte) · [[acao:abrir_cadastro:NOME]] botão para abrir o cadastro
+[[acao:lista_mes:MES]] mostra no chat a lista de aniversariantes de um mês (ex.: março)
 Use uma ação só quando o usuário pedir para fazer ou ver algo. Nunca diga que já fez algo: diga "vou abrir", "aqui está" ou "clique no botão abaixo".
 
 MOSTRAR NA TELA
@@ -79,7 +82,8 @@ REGRAS
 - Fale só do AkiCut e de assuntos de trabalho ligados a ele. Para outros assuntos, responda em uma frase gentil e volte ao app.
 - Não invente botões, telas ou números. Se não souber, diga que não tem certeza e sugira onde procurar.
 - Use os números da situação atual quando ajudarem.
-- Você não vê fotos nem nomes do cadastro; para pessoas específicas, use as ações buscar ou arte.
+- PESSOAS: quando a pergunta cita alguém, a situação atual traz "pessoas_encontradas" com as fichas reais (nome, aniversário, faltam_dias, fotos, melhor_nota, status da arte, aviso). Responda com esses dados, de forma direta, e termine com [[acao:pessoa:NOME COMPLETO]] para mostrar a ficha. Se vier mais de uma pessoa, diga quais encontrou e pergunte qual é. Se vier "busca_sem_resultado", diga que não encontrou ninguém com esse nome e, se houver "nomes_parecidos", sugira-os. Nunca invente pessoas, datas ou números que não estejam nos dados.
+- "aniversariantes_do_mes_aberto" (quando vier) lista dia e nome do mês aberto: use para perguntas sobre quem faz aniversário.
 - Se perguntarem quanto você consome, seu estado ou seus limites, diga que o painel aparece tocando no seu nome no topo do chat, ou digitando /status.`;
 }
 

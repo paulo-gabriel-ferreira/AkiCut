@@ -727,6 +727,10 @@ const TRECHOS = [
    "comeco"
   ],
   "t": "Comece importando a pasta de fotos em Colaboradores. Depois cole a lista do mês em Aniversariantes e clique em Gerar artes do mês."
+ },
+ {
+  "k": ["quem e", "ficha", "informacoes", "aniversario de", "dados do", "dados da", "colaborador", "procurar pessoa"],
+  "t": "O Dex acha colaboradores pelo nome, mesmo sem acento, só com o primeiro nome ou com grafia parecida (Souza e Sousa, Luis e Luiz). Perguntas como 'quem é a Ana Souza?', 'aniversário do Bruno' ou 'fotos da Carla' mostram a ficha no chat: aniversário e quantos dias faltam, quantas fotos e a melhor nota, e o status da arte do mês, com botões para abrir o cadastro ou a arte. 'Aniversariantes de março' mostra a lista do mês. Isso é respondido pelo próprio site, sem gastar IA."
  }
 ];
 

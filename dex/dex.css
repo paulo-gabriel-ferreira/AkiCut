@@ -9,7 +9,7 @@
    7. Chat (o "espaço do Dex")
    8. Painel de consumo
    9. Estúdio do Dex (Ajustes)
-  10. Carregamentos: ZIP (envelope) e artes (pintando)
+  10. Carregamentos: o Dex trabalhando (arte, ZIP, foto e geral)
   11. Celular, modo leve e movimento reduzido
    ============================================================================= */
 
@@ -322,6 +322,28 @@ html.dex-on[data-dex-lado="esquerda"]:not([data-ak-orb="nao"]) #aiChat{right:24p
 #aiChat .ai-chat-input.tem-texto button[type="submit"]{transform:none;opacity:1}
 #aiChat .ak-pal{border-radius:22px !important;background:var(--dx-bg2) !important;border:1px solid var(--dx-borda) !important}
 
+/* ficha do colaborador e lista do mês, dentro do chat */
+#aiChat .dx-pessoa{margin-top:10px;padding:14px;border-radius:18px;background:var(--dx-sup);border:1px solid var(--dx-borda);color:var(--dx-txt)}
+#aiChat .dx-pessoa-topo{display:flex;align-items:center;gap:12px}
+#aiChat .dx-pessoa-ava{position:relative;flex:none;width:44px;height:44px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:var(--dx-sup2);color:var(--dx-forte);font:650 14px/1 var(--f-ui)}
+#aiChat .dx-pessoa-ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#aiChat .dx-pessoa-nome{min-width:0;flex:1}
+#aiChat .dx-pessoa-nome b{display:block;font:650 14.5px/1.25 var(--f-ui);color:var(--dx-forte);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#aiChat .dx-pessoa-nome small{display:block;margin-top:2px;font-size:11.5px;color:var(--dx-txt3)}
+#aiChat .dx-pessoa-st{flex:none;width:9px;height:9px;border-radius:50%;background:#e0a33a;box-shadow:0 0 0 3px color-mix(in srgb,#e0a33a 22%,transparent)}
+#aiChat .dx-pessoa-st.ok{background:#3fb47a;box-shadow:0 0 0 3px color-mix(in srgb,#3fb47a 22%,transparent)}
+#aiChat .dx-pessoa-st.falta{background:#d0605a;box-shadow:0 0 0 3px color-mix(in srgb,#d0605a 22%,transparent)}
+#aiChat .dx-pessoa-dados{margin:12px 0 0;display:grid;gap:1px;border-radius:12px;overflow:hidden;background:var(--dx-borda)}
+#aiChat .dx-pessoa-dados>div{display:flex;justify-content:space-between;gap:12px;padding:9px 11px;background:var(--dx-bg2)}
+#aiChat .dx-pessoa-dados dt{font-size:11.5px;color:var(--dx-txt3)}
+#aiChat .dx-pessoa-dados dd{margin:0;font-size:12.5px;color:var(--dx-txt);text-align:right}
+#aiChat .dx-pessoa .ak-btns{margin-top:12px}
+#aiChat .dx-lista-mes{display:grid;gap:4px;margin-top:10px;max-height:240px;overflow:auto;scrollbar-width:thin}
+#aiChat .dx-lm-item{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--dx-sup);cursor:pointer;transition:background .2s ease}
+#aiChat .dx-lm-item:hover{background:var(--dx-sup2)}
+#aiChat .dx-lm-item span{font:650 12px/1 var(--f-num,var(--f-ui));color:var(--dx-txt3);font-variant-numeric:tabular-nums;width:20px}
+#aiChat .dx-lm-item b{flex:1;min-width:0;font:500 13px/1.3 var(--f-ui);color:var(--dx-txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ============ 8. PAINEL DE CONSUMO ============ */
 .dx-cortina{position:absolute;inset:0;z-index:5;background:var(--dx-cortina);opacity:0;pointer-events:none;transition:opacity .35s ease}
 .dx-cortina.on{opacity:1;pointer-events:auto}
@@ -383,7 +405,10 @@ dialog.dx-est::backdrop{background:rgba(4,5,8,.55)}
   background:radial-gradient(70% 55% at 50% 42%,var(--dx-topo) 0%,var(--dx-bg2) 60%,var(--dx-bg) 100%)}
 .dx-est-palco.arrastando{cursor:grabbing}
 .dx-est-palco::after{content:"";position:absolute;left:18%;right:18%;bottom:19%;height:16%;border-radius:50%;background:radial-gradient(closest-side,var(--dx-sup2),transparent);pointer-events:none}
-.dx-est-dex{width:min(210px,52%);position:relative;z-index:1;will-change:transform}
+.dx-est-dex{width:min(210px,52%);position:relative;z-index:1;will-change:transform;transform-origin:50% 92%}
+.dx-roupa-velha{position:absolute;left:0;top:0;width:100%;pointer-events:none;z-index:2}
+.dx-troca-luz{position:absolute;left:50%;top:44%;width:120%;aspect-ratio:1;border-radius:50%;pointer-events:none;z-index:3;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,.18) 45%,transparent 72%);mix-blend-mode:screen}
 .dx-est-nome{all:unset;box-sizing:border-box;width:220px;text-align:center;font:700 26px/1.1 var(--f-ui);letter-spacing:-.02em;color:var(--dx-forte) !important;padding:6px 10px;border-radius:14px;
   transition:background .25s ease;z-index:1;border:0 !important;box-shadow:none !important;background:transparent !important}
 .dx-est-nome:hover,.dx-est-nome:focus{background:var(--dx-sup) !important;box-shadow:none !important;outline:none !important}
@@ -445,57 +470,54 @@ dialog.dx-est::backdrop{background:rgba(4,5,8,.55)}
 .dx-est-pe button{all:unset;cursor:pointer;padding:11px 16px;border-radius:999px;background:var(--dx-sup2);color:var(--dx-forte);font:500 13px/1 var(--f-ui);transition:background .25s ease}
 .dx-est-pe .pri{background:var(--dx-inv);color:var(--dx-inv-txt)}
 
-/* ============ 10. CARREGAMENTOS: ZIP (envelope) E ARTES (pintando) ============ */
-.dx-carga-veu{position:fixed;inset:0;z-index:1001;background:rgba(8,10,14,.18);opacity:0;transition:opacity .35s ease}
+/* ============ 10. CARREGAMENTOS: o Dex trabalhando (arte, ZIP, foto e geral) ============ */
+.dx-carga-veu{position:fixed;inset:0;z-index:1001;background:rgba(10,12,16,.42);opacity:0;transition:opacity .4s ease}
 .dx-carga-veu.on{opacity:1}
-.dx-carga{position:fixed;left:50%;bottom:28px;z-index:1002;width:min(340px,calc(100vw - 28px));padding:14px 16px 16px;border-radius:26px;background:var(--dx-bg);color:var(--dx-txt);
-  border:1px solid var(--dx-borda);box-shadow:var(--dx-sombra);transform:translateX(-50%);contain:layout paint}
-.dx-cena-box{position:relative}
-.dx-carga svg.dx-cena{display:block;width:100%;height:auto;overflow:visible}
-.dx-cena-dex{position:absolute;z-index:1}
-.dx-cena-dex .dex-svg{width:100%;height:auto}
-.dx-cena-dex .dex-ros-bigode{transform-box:fill-box;transform-origin:50% 0;transform:scale(1.35)}
-.dx-carga-pe{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:6px}
-.dx-carga-pe span{font:500 12.5px/1.3 var(--f-ui);color:var(--dx-txt2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dx-carga-pe b{font:700 26px/1 var(--f-num,system-ui);color:var(--dx-forte);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.dx-carga-pe b small{font-size:.5em;margin-left:1px}
-.dx-carga-barra{height:6px;border-radius:6px;background:var(--dx-sup2);overflow:hidden;margin-top:10px}
+.dx-carga{position:fixed;left:50%;top:50%;z-index:1002;width:min(400px,calc(100vw - 32px));padding:10px 10px 18px;border-radius:28px;background:var(--dx-bg);color:var(--dx-txt);
+  border:1px solid var(--dx-borda);box-shadow:var(--dx-sombra);transform:translate(-50%,-50%);contain:layout paint}
+.dx-carga.pronto{pointer-events:none}
+.dx-carga-cena{border-radius:20px;background:radial-gradient(120% 90% at 50% 100%,var(--dx-sup) 0%,transparent 70%),var(--dx-bg2);overflow:hidden}
+.dx-carga svg.dx-cena{display:block;width:100%;height:auto}
+.dx-carga-info{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:16px 10px 0}
+.dx-carga-txt{min-width:0}
+.dx-carga-txt b{display:block;font:600 15px/1.25 var(--f-ui);color:var(--dx-forte);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.dx-carga-txt small{display:block;min-height:15px;margin-top:3px;font:500 12px/1.25 var(--f-ui);color:var(--dx-txt3);font-variant-numeric:tabular-nums}
+.dx-carga-pct{font:650 30px/1 var(--f-num,var(--f-ui));color:var(--dx-forte);letter-spacing:-.04em;font-variant-numeric:tabular-nums;flex:none}
+.dx-carga-pct small{font-size:.46em;margin-left:2px;color:var(--dx-txt3);letter-spacing:0}
+.dx-carga-barra{height:4px;border-radius:4px;background:var(--dx-sup2);overflow:hidden;margin:14px 10px 0}
 .dx-carga-barra i{display:block;height:100%;width:100%;border-radius:inherit;background:var(--dx-forte);transform-origin:left;transform:scaleX(0);will-change:transform}
+/* o boneco da cena é movido por molas em JS: nada de animação em loop por cima */
+.dx-carga .dex-svg *{animation:none !important;transition:none !important}
+.dx-carga .dex-svg .dex-o>*,.dx-carga .dex-svg .dex-boca>*,.dx-carga .dex-svg .dex-bochecha{transition:opacity .2s ease,transform .32s cubic-bezier(.3,1.35,.5,1) !important}
+.dx-carga .dex-ros-bigode{transform-box:fill-box;transform-origin:50% 0}
+.dx-chao{fill:var(--dx-sup2);opacity:.55}
+.dx-sombra-a{fill:#000;opacity:.2}
+/* objetos */
+.dx-madeira{fill:none;stroke:#8E7A62;stroke-width:4;stroke-linecap:round}
+.dx-madeira-p{fill:#8E7A62}
+.dx-tela{fill:#FBFBF9;stroke:#CDD2D9;stroke-width:1.5}
+.dx-traco{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dx-ok-c{fill:#2B2F36;stroke:#fff;stroke-width:2.2}
+.dx-ok-v{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+.dx-prancheta{fill:#5B4E40;stroke:#3E352B;stroke-width:1.5}
+.dx-folha-p{fill:#FBFBF9}
+.dx-clipe{fill:#B9BEC6;stroke:#80868F;stroke-width:1.2}
+.dx-linha-c{stroke:#E3E6EA;stroke-width:3;stroke-linecap:round}
 /* envelope */
-.dx-env-corpo{fill:#F4C542;stroke:#B98A13;stroke-width:2;stroke-linejoin:round}
-.dx-env-frente{fill:#F7D25E;stroke:#B98A13;stroke-width:2;stroke-linejoin:round}
-.dx-env-aba{fill:#E9B531;stroke:#B98A13;stroke-width:2;stroke-linejoin:round;transform-box:view-box;transform-origin:206px 52px;transform:scaleY(-1);transition:transform .7s var(--mola-pula,ease)}
-.dx-carga.pronto .dx-env-aba{transform:none}
-.dx-papel{transform-box:view-box;opacity:0;animation:dxVoo 1.5s cubic-bezier(.45,.05,.35,1) infinite}
-.dx-papel:nth-of-type(2){animation-delay:.5s}.dx-papel:nth-of-type(3){animation-delay:1s}
-.dx-papel rect{fill:#fff;stroke:#c9ced6;stroke-width:1.2}
-.dx-papel path{stroke:#c9ced6;stroke-width:1.4;stroke-linecap:round}
-@keyframes dxVoo{0%{opacity:0;transform:translate(124px,40px) rotate(-18deg) scale(.7)}12%{opacity:1}
-  48%{transform:translate(156px,2px) rotate(10deg) scale(.95)}76%{opacity:1;transform:translate(194px,36px) rotate(-4deg) scale(.85)}100%{opacity:0;transform:translate(198px,70px) rotate(0) scale(.7)}}
-.dx-carga.pronto .dx-papel{animation:none;opacity:0}
-.dx-env-pilha{transform-box:view-box;transform-origin:206px 92px;transform:scaleY(var(--pilha,0));transition:transform .5s var(--mola,ease)}
-.dx-env-ok{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.4);transition:opacity .3s ease,transform .6s var(--mola-pula,ease)}
-.dx-carga.pronto .dx-env-ok{opacity:1;transform:none}
-.dx-carga.pronto .dx-env{animation:dxSalta .7s var(--mola-pula,ease)}
-@keyframes dxSalta{0%,100%{transform:none}40%{transform:translateY(-8px)}}
-.dx-env{transform-box:view-box;transform-origin:206px 92px}
-/* Dex jogando os papéis */
-.dex-svg[data-humor="jogando"] .dex-braco-d{transform:rotate(-112deg)}
-.dex-svg[data-humor="jogando"] .dex-braco-d .dex-osc{animation:dxJoga .5s cubic-bezier(.45,.05,.35,1) infinite}
-.dex-svg[data-humor="jogando"] .dex-braco-e{transform:rotate(-24deg)}
-.dex-svg[data-humor="jogando"] .dex-olhos{transform:translate(4px,-2px)}
-.dex-svg[data-humor="jogando"] .dex-boca-sorriso{transform:scale(1.2,1.3)}
-@keyframes dxJoga{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-26deg)}}
-/* Dex pintando: bigode, boina e pincel */
-.dex-svg[data-humor="pintando"] .dex-braco-d{transform:rotate(-96deg)}
-.dex-svg[data-humor="pintando"] .dex-braco-d .dex-osc{animation:dxPinta 1.1s ease-in-out infinite}
-.dex-svg[data-humor="pintando"] .dex-braco-e{transform:rotate(10deg)}
-.dex-svg[data-humor="pintando"] .dex-olhos{transform:translate(5px,1px)}
-.dex-svg[data-humor="pintando"] .dex-cabeca{transform:rotate(4deg)}
-@keyframes dxPinta{0%,100%{transform:rotate(14deg)}25%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}75%{transform:rotate(-14deg)}}
-.dx-traco{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--l);stroke-dashoffset:var(--l);transition:stroke-dashoffset .6s var(--mola,ease)}
-.dx-carga.pronto .dx-quadro{animation:dxSalta .7s var(--mola-pula,ease)}
-.dx-quadro{transform-box:view-box;transform-origin:220px 60px}
+.dx-env-fundo{fill:#DDAA3A;stroke:#A07618;stroke-width:1.8}
+.dx-env-frente{fill:#ECC254;stroke:#A07618;stroke-width:1.8;stroke-linejoin:round}
+.dx-env-aba{fill:#D7A132;stroke:#A07618;stroke-width:1.8;stroke-linejoin:round}
+.dx-env-dobra{stroke:#A07618;stroke-width:1.4;stroke-linecap:round;opacity:.45;fill:none}
+.dx-env-cheio{fill:#fff;stroke:#D5D9DF;stroke-width:1}
+.dx-papel{fill:#fff;stroke:#C9CED6;stroke-width:1.2}
+.dx-papel-l{stroke:#C9CED6;stroke-width:1.6;stroke-linecap:round;fill:none}
+.dx-folha-z{fill:#fff;stroke:#C9CED6;stroke-width:1}
+
+/* câmera */
+.dx-cam{fill:#2B2F36;stroke:#14161A;stroke-width:1.5}
+.dx-cam-l{fill:#4A5360;stroke:#B9BEC6;stroke-width:2}
+.dx-flash{fill:#fff;opacity:0}
 
 /* ============ 11. CELULAR, MODO LEVE E MOVIMENTO REDUZIDO ============ */
 @media (max-width:760px){

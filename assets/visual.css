@@ -1,0 +1,106 @@
+/* =============================================================================
+   AkiCut · visual.css — visual de ferramenta profissional
+   Carregado por último. Troca o roxo e os enfeites coloridos por uma base neutra
+   (grafite, branco e cinzas), com uma única cor de destaque, discreta. As cinco
+   cores da Akiyama ficam só na marca "Aki". Os verde/amarelo/vermelho de status
+   continuam, porque informam alguma coisa.
+   1. Cores base (claro e escuro)
+   2. Menu lateral
+   3. Início
+   4. Botões, rótulos e painéis
+   ============================================================================= */
+
+/* ---------- 1. Cores base ---------- */
+html:not(#ak){
+  --bg:#F4F5F7; --panel:#FFFFFF; --panel2:#F8F9FA; --line:#E3E5E9; --line2:#ECEEF1;
+  --ink:#111318; --ink2:#434852; --ink3:#747A86;
+  --accent:#3F4FBF; --accent2:#5B6AD0; --accent-soft:#ECEEF8; --accent-ink:#33409E; --onaccent:#FFFFFF;
+  --ok:#1C7A4E; --okbg:#E7F4EC; --warn:#8C6416; --warnbg:#FBF3E2; --err:#B03A4C; --errbg:#FBECEE;
+  --shadow:0 1px 2px rgba(16,18,24,.04),0 8px 24px rgba(16,18,24,.06);
+  --pro-cta:#111318; --pro-cta-txt:#FFFFFF;
+}
+html:not(#ak)[data-theme="dark"]{
+  --bg:#0B0C0F; --panel:#121418; --panel2:#171A1F; --line:#23262D; --line2:#1C1F25;
+  --ink:#ECEEF1; --ink2:#B2B6BE; --ink3:#7E838D;
+  --accent:#9AA5F2; --accent2:#B3BBF6; --accent-soft:#1B1E2B; --accent-ink:#C3C9F8; --onaccent:#0B0C0F;
+  --ok:#5FC795; --okbg:#122A1E; --warn:#E0B866; --warnbg:#2B2314; --err:#F08C9B; --errbg:#2E161B;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.28);
+  --pro-cta:#ECEEF1; --pro-cta-txt:#0B0C0F;
+}
+@media (prefers-color-scheme:dark){
+  html:not(#ak):not([data-theme="light"]){
+    --bg:#0B0C0F; --panel:#121418; --panel2:#171A1F; --line:#23262D; --line2:#1C1F25;
+    --ink:#ECEEF1; --ink2:#B2B6BE; --ink3:#7E838D;
+    --accent:#9AA5F2; --accent2:#B3BBF6; --accent-soft:#1B1E2B; --accent-ink:#C3C9F8; --onaccent:#0B0C0F;
+    --ok:#5FC795; --okbg:#122A1E; --warn:#E0B866; --warnbg:#2B2314; --err:#F08C9B; --errbg:#2E161B;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.28);
+    --pro-cta:#ECEEF1; --pro-cta-txt:#0B0C0F;
+  }
+}
+html:not(#ak) body::before{background:none !important}
+html:not(#ak) body::after{opacity:.3 !important}
+
+/* ---------- 2. Menu lateral: grafite, sem brilho roxo ---------- */
+html:not(#ak) .top{background:#0D0F12 !important;border-right:1px solid #1D2026 !important;box-shadow:none !important}
+html:not(#ak) .ak-deco::before{display:none !important}
+html:not(#ak) .ak-deco::after{opacity:.07 !important}
+html:not(#ak) .ak-lema{display:none !important}
+html:not(#ak) .top .brand::before,html:not(#ak) .top .brand .nm::before{display:none !important}
+html:not(#ak) .top .brand::after{opacity:.5 !important;height:1px !important;background:#2A2E36 !important}
+html:not(#ak) .top #brandsub{color:#7E838D !important}
+html:not(#ak) .top .tabs::before{color:#5F646E !important}
+html:not(#ak) .top .tabs button{color:#AEB2BA !important}
+html:not(#ak) .top .tabs button[aria-selected="true"]{color:#FFFFFF !important}
+html:not(#ak) .top .tabs button::before{background:#3A3E46 !important;opacity:1 !important;box-shadow:none !important}
+html:not(#ak) .top .tabs button[aria-selected="true"]::before{background:#ECEEF1 !important}
+html:not(#ak) .top .tabs button::after{background:#ECEEF1 !important;box-shadow:none !important}
+html:not(#ak) .top .tabs button .nav-ico{opacity:.85}
+html:not(#ak) .ak-glider{background:rgba(255,255,255,.07) !important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important}
+html:not(#ak) .top .iconbtn{background:rgba(255,255,255,.04) !important;border-color:#23262D !important;color:#C9CCD3 !important}
+
+/* ---------- 3. Início: grafite elegante, ilustração em tons de cinza ---------- */
+html:not(#ak) .ak-hero{background:linear-gradient(160deg,#16191E 0%,#101215 60%,#0D0F12 100%) !important;border:1px solid #1F2228 !important;box-shadow:0 30px 80px rgba(8,10,14,.25) !important}
+html:not(#ak) .ak-hero::before{opacity:.16 !important}
+html:not(#ak) .ak-hero::after{display:none !important}
+/* a ilustração vira tons de cinza trocando as cores direto (filtro em algo animado pesa) */
+html:not(#ak) .ak-arte svg stop[stop-color="#2c32a0"]{stop-color:#3A3E46}
+html:not(#ak) .ak-arte svg stop[stop-color="#32296f"]{stop-color:#24272D}
+html:not(#ak) .ak-arte svg stop[stop-color="#7a70f0"]{stop-color:#8A8F99}
+html:not(#ak) .ak-arte svg stop[stop-color="#3b3399"]{stop-color:#4A4F58}
+html:not(#ak) .ak-arte svg [fill="#32296f"]{fill:#24272D}
+html:not(#ak) .ak-arte svg [stroke="rgba(27,186,204,.6)"]{stroke:rgba(255,255,255,.28)}
+html:not(#ak) .ak-arte svg [stroke="#e7b96a"]{stroke:#C9CCD3}
+html:not(#ak) .ak-arte svg [fill="#e7b96a"]{fill:#D5D8DE}
+html:not(#ak) .ak-arte svg [fill="#40AF73"]{fill:#5A5F69}
+html:not(#ak) .ak-arte svg [fill="#1BBACC"]{fill:#8A8F99}
+html:not(#ak) .ak-arte svg [fill="#0E69BE"]{fill:#5A5F69}
+html:not(#ak) .ak-arte svg [fill="#7818FA"],html:not(#ak) .ak-arte svg [fill="#9143FA"]{fill:#3F434B}
+html:not(#ak) .ak-arte{opacity:.9}
+html:not(#ak) .ak-etq{color:#8A8F99 !important}
+html:not(#ak) .ak-hero h1,html:not(#ak) .ak-hero h1 *{color:#F2F3F5 !important;-webkit-text-fill-color:#F2F3F5 !important}
+html:not(#ak) .ak-hero-sub{color:#A3A8B1 !important}
+html:not(#ak) .inicio-card{background:rgba(255,255,255,.035) !important;border:1px solid rgba(255,255,255,.09) !important;box-shadow:none !important}
+html:not(#ak) .inicio-card:hover{background:rgba(255,255,255,.06) !important}
+html:not(#ak) .inicio-card.principal{background:#F2F3F5 !important;border-color:#F2F3F5 !important;box-shadow:0 10px 30px rgba(0,0,0,.25) !important}
+html:not(#ak) .inicio-card.principal *{color:#111318 !important}
+html:not(#ak) .inicio-card.principal small{color:#5C616B !important}
+html:not(#ak) .inicio-card.principal .inicio-ico{background:#111318 !important;color:#F2F3F5 !important}
+html:not(#ak) .inicio-card.principal .inicio-ico *{color:#F2F3F5 !important;fill:currentColor}
+html:not(#ak) .inicio-card .inicio-ico{background:rgba(255,255,255,.07) !important;box-shadow:none !important}
+html:not(#ak) .ak-mes i{background:#3A3E46 !important;border-color:#3A3E46 !important;box-shadow:none !important}
+html:not(#ak) .ak-mes.passou i{background:#6B707A !important;border-color:#6B707A !important}
+html:not(#ak) .ak-mes.agora i{background:#F2F3F5 !important;border-color:#F2F3F5 !important;box-shadow:0 0 0 5px rgba(242,243,245,.12) !important}
+html:not(#ak) .ak-mes.agora i::after{display:none !important}
+html:not(#ak) .ak-trilha::before{border-color:#30343B !important;background:none !important}
+html:not(#ak) .ak-num::after{background:var(--line) !important;opacity:1 !important}
+html:not(#ak) .ak-num b,html:not(#ak) .inicio-num{color:var(--ink) !important;-webkit-text-fill-color:var(--ink) !important;background:none !important}
+
+/* ---------- 4. Botões, rótulos e painéis ---------- */
+html:not(#ak) .btn.primary,html:not(#ak) button.primary{background:var(--pro-cta) !important;color:var(--pro-cta-txt) !important;border-color:var(--pro-cta) !important;box-shadow:none !important;background-image:none !important}
+html:not(#ak) .btn.primary:hover,html:not(#ak) button.primary:hover{filter:brightness(1.12)}
+html:not(#ak) .tlabel::before{background:var(--ink3) !important;box-shadow:none !important}
+html:not(#ak) .tlabel{color:var(--ink3) !important}
+html:not(#ak) .panel-h h2::before,html:not(#ak) .panel-h h3::before,html:not(#ak) .panel-h::before{background:var(--ink) !important;background-image:none !important;box-shadow:none !important}
+html:not(#ak) .mchip.on,html:not(#ak) .mchip[aria-pressed="true"],html:not(#ak) .mchip.active{background:var(--pro-cta) !important;color:var(--pro-cta-txt) !important;border-color:var(--pro-cta) !important;box-shadow:none !important}
+html:not(#ak) .ico-chap::before{display:none !important}
+html:not(#ak) ::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}

@@ -63,7 +63,8 @@ html[data-dex-anim="sutil"]{--dex-k:.5} html[data-dex-anim="expressiva"]{--dex-k
 @keyframes dexPulo{0%{transform:none}14%{transform:scale(1.14,.82)}38%{transform:translate3d(0,calc(-20% * var(--dex-k,1)),0) scale(.9,1.12)}62%{transform:scale(1.1,.9)}80%{transform:scale(.97,1.03)}100%{transform:none}}
 @keyframes dexQuica{0%{transform:none}30%{transform:scale(1.07,.93)}62%{transform:translate3d(0,-6%,0) scale(.97,1.04)}100%{transform:none}}
 @keyframes dexPirueta{0%{transform:none}20%{transform:translate3d(0,-11%,0)}50%{transform:translate3d(0,-17%,0) scaleX(-1)}80%{transform:translate3d(0,-6%,0)}100%{transform:none}}
-.dex.voando .dex-incl{transform:rotate(var(--lean,0deg))}
+.dex.voando:not(.dex-voo-js) .dex-incl{transform:rotate(var(--lean,0deg))}
+.dex.dex-voo-js .dex-incl{transition:none !important}
 .dex.voando .dex-sombra{opacity:0;animation:none}
 
 /* ============ 3. JUNTAS E EXPRESSÕES ============ */
@@ -196,7 +197,14 @@ html[data-dex-anim="sutil"]{--dex-k:.5} html[data-dex-anim="expressiva"]{--dex-k
 .dex-svg[data-cab="antena"] .dex-cab-antena,.dex-svg[data-cab="festa"] .dex-cab-festa,.dex-svg[data-cab="natal"] .dex-cab-natal,.dex-svg[data-cab="coelho"] .dex-cab-coelho,
 .dex-svg[data-cab="formatura"] .dex-cab-formatura,.dex-svg[data-cab="chef"] .dex-cab-chef,.dex-svg[data-cab="coroa"] .dex-cab-coroa,.dex-svg[data-cab="fones"] .dex-cab-fones,
 .dex-svg[data-rosto="oculos"] .dex-ros-oculos,.dex-svg[data-rosto="escuros"] .dex-ros-escuros,.dex-svg[data-rosto="bigode"] .dex-ros-bigode,
-.dex-svg[data-corpo="gravata"] .dex-crp-gravata,.dex-svg[data-corpo="cachecol"] .dex-crp-cachecol,.dex-svg[data-corpo="noel"] .dex-crp-noel{display:inline}
+.dex-svg[data-corpo="gravata"] .dex-crp-gravata,.dex-svg[data-corpo="cachecol"] .dex-crp-cachecol,.dex-svg[data-corpo="noel"] .dex-crp-noel,
+.dex-svg[data-cab="ninja"] .dex-cab-ninja,.dex-svg[data-cab="lutador"] .dex-cab-lutador,.dex-svg[data-cab="samurai"] .dex-cab-samurai,.dex-svg[data-cab="astronauta"] .dex-cab-astronauta,
+.dex-svg[data-cab="pirata"] .dex-cab-pirata,.dex-svg[data-cab="mago"] .dex-cab-mago,.dex-svg[data-cab="cowboy"] .dex-cab-cowboy,
+.dex-svg[data-rosto="ninja"] .dex-ros-ninja,.dex-svg[data-rosto="tapa"] .dex-ros-tapa,.dex-svg[data-rosto="heroi"] .dex-ros-heroi,
+.dex-svg[data-corpo="kimono"] .dex-crp-kimono,.dex-svg[data-corpo="faixa"] .dex-crp-faixa,.dex-svg[data-corpo="armadura"] .dex-crp-armadura,.dex-svg[data-corpo="traje"] .dex-crp-traje,
+.dex-svg[data-corpo="colete"] .dex-crp-colete,.dex-svg[data-corpo="manto"] .dex-crp-manto,.dex-svg[data-corpo="capa"] .dex-crp-capa,.dex-svg[data-corpo="lenco"] .dex-crp-lenco{display:inline}
+/* com máscara ninja ou de herói a boca e as bochechas ficam escondidas */
+.dex-svg[data-rosto="ninja"] .dex-boca,.dex-svg[data-rosto="ninja"] .dex-bochecha{opacity:0}
 .dex-svg .dex-cab-antena path{stroke:var(--c-linha);stroke-width:3;stroke-linecap:round}
 .dex-svg .dex-cab-antena circle{fill:var(--dex-olho);stroke:var(--c-linha);stroke-width:2.5}
 .dex-svg .dex-bigode-coelho{stroke:var(--dex-olho);stroke-width:1.6;stroke-linecap:round;opacity:.55;fill:none}
@@ -344,6 +352,27 @@ html.dex-on[data-dex-lado="esquerda"]:not([data-ak-orb="nao"]) #aiChat{right:24p
 #aiChat .dx-lm-item span{font:650 12px/1 var(--f-num,var(--f-ui));color:var(--dx-txt3);font-variant-numeric:tabular-nums;width:20px}
 #aiChat .dx-lm-item b{flex:1;min-width:0;font:500 13px/1.3 var(--f-ui);color:var(--dx-txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
+/* ajuda, resumo do ano e avisos no chat */
+#aiChat .dx-nota-chat{margin-top:8px;font-size:13px;line-height:1.45;color:var(--dx-txt)}
+#aiChat .dx-copia{width:100%;height:90px;margin-top:8px;border-radius:12px;border:1px solid var(--dx-borda);background:var(--dx-bg2);color:var(--dx-txt);font:12px/1.4 var(--f-ui);padding:8px}
+#aiChat .dx-ajuda{display:grid;gap:12px;margin-top:10px}
+#aiChat .dx-ajuda-t{display:block;font:600 10.5px/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--dx-txt3);margin-bottom:7px}
+#aiChat .dx-ajuda-c{display:flex;flex-wrap:wrap;gap:6px}
+#aiChat .dx-chip-cmd{all:unset;cursor:pointer;padding:7px 11px;border-radius:999px;background:var(--dx-sup);border:1px solid var(--dx-borda);font:500 12px/1 var(--f-ui);color:var(--dx-txt);transition:background .2s ease}
+#aiChat .dx-chip-cmd:hover{background:var(--dx-sup2)}
+#aiChat .dx-ano{margin-top:10px;padding:12px;border-radius:16px;background:var(--dx-sup);border:1px solid var(--dx-borda);display:grid;gap:3px}
+#aiChat .dx-ano-topo{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+#aiChat .dx-ano-topo b{font:650 15px/1 var(--f-num,var(--f-ui));color:var(--dx-forte)}
+#aiChat .dx-ano-topo small{font-size:11px;color:var(--dx-txt3)}
+#aiChat .dx-ano-m{all:unset;cursor:pointer;display:grid;grid-template-columns:30px 1fr 22px;align-items:center;gap:8px;padding:3px 4px;border-radius:8px}
+#aiChat .dx-ano-m:hover{background:var(--dx-sup2)}
+#aiChat .dx-ano-m span{font:600 10.5px/1 var(--f-ui);text-transform:uppercase;letter-spacing:.06em;color:var(--dx-txt3)}
+#aiChat .dx-ano-m.agora span{color:var(--dx-forte)}
+#aiChat .dx-ano-m>i{position:relative;height:7px;border-radius:7px;background:var(--dx-bg2);overflow:hidden}
+#aiChat .dx-ano-m>i>i{position:absolute;inset:0;border-radius:inherit;background:var(--dx-txt3);opacity:.45;transform-origin:left}
+#aiChat .dx-ano-m>i>i.g{background:var(--dx-forte);opacity:1}
+#aiChat .dx-ano-m em{font:600 11px/1 var(--f-num,var(--f-ui));font-style:normal;color:var(--dx-txt2);text-align:right;font-variant-numeric:tabular-nums}
+
 /* ============ 8. PAINEL DE CONSUMO ============ */
 .dx-cortina{position:absolute;inset:0;z-index:5;background:var(--dx-cortina);opacity:0;pointer-events:none;transition:opacity .35s ease}
 .dx-cortina.on{opacity:1;pointer-events:auto}
@@ -476,6 +505,7 @@ dialog.dx-est::backdrop{background:rgba(4,5,8,.55)}
 .dx-carga{position:fixed;left:50%;top:50%;z-index:1002;width:min(400px,calc(100vw - 32px));padding:10px 10px 18px;border-radius:28px;background:var(--dx-bg);color:var(--dx-txt);
   border:1px solid var(--dx-borda);box-shadow:var(--dx-sombra);transform:translate(-50%,-50%);contain:layout paint}
 .dx-carga.pronto{pointer-events:none}
+html.ak-pausa-carga body>*:not(.dx-carga):not(.dx-carga-veu),html.ak-pausa-carga body>*:not(.dx-carga):not(.dx-carga-veu) *{animation-play-state:paused !important}
 .dx-carga-cena{border-radius:20px;background:radial-gradient(120% 90% at 50% 100%,var(--dx-sup) 0%,transparent 70%),var(--dx-bg2);overflow:hidden}
 .dx-carga svg.dx-cena{display:block;width:100%;height:auto}
 .dx-carga-info{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:16px 10px 0}
@@ -518,6 +548,42 @@ dialog.dx-est::backdrop{background:rgba(4,5,8,.55)}
 .dx-cam{fill:#2B2F36;stroke:#14161A;stroke-width:1.5}
 .dx-cam-l{fill:#4A5360;stroke:#B9BEC6;stroke-width:2}
 .dx-flash{fill:#fff;opacity:0}
+/* partículas das cenas */
+.dx-p-nota{font:700 11px/1 var(--f-ui);fill:var(--dx-txt2)}
+.dx-p-mais{font:700 10px/1 var(--f-ui);fill:var(--dx-forte);text-anchor:middle}
+.dx-p-brilho{fill:#F2E6C8}
+.dx-env-n{font:700 9px/1 var(--f-num,var(--f-ui));fill:#7A5A12;text-anchor:middle;font-variant-numeric:tabular-nums}
+.dx-carimbo{fill:none;stroke:#7A5A12;stroke-width:1.6}
+.dx-carimbo-t{font:800 7px/1 var(--f-ui);fill:#7A5A12;text-anchor:middle;letter-spacing:.08em}
+
+ /* fantasias bloqueadas e conquistas */
+.dx-card.trancado .dex-svg{filter:brightness(0);opacity:.28}
+.dx-card.trancado span{color:var(--dx-txt3)}
+.dx-card{position:relative}
+.dx-cadeado{position:absolute;left:50%;top:38%;width:22px;height:22px;transform:translate(-50%,-50%);color:var(--dx-txt2);pointer-events:none}
+.dx-cadeado svg{width:100%;height:100%}
+.dx-conqs{display:grid;gap:6px}
+.dx-conq{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--dx-sup);border:1px solid var(--dx-borda)}
+.dx-conq-ava{flex:none;width:38px;height:44px;display:grid;place-items:center}
+.dx-conq-ava .dex-svg{width:38px}
+.dx-conq:not(.ok) .dx-conq-ava .dex-svg{filter:brightness(0);opacity:.3}
+.dx-conq-txt{flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;column-gap:8px;align-items:center}
+.dx-conq-txt b{grid-column:1/-1;font:600 13px/1.2 var(--f-ui);color:var(--dx-forte)}
+.dx-conq-txt small{grid-column:1/-1;font-size:11.5px;color:var(--dx-txt3);margin-top:1px}
+.dx-conq-barra{display:block;height:4px;border-radius:4px;background:var(--dx-bg2);overflow:hidden;margin-top:6px}
+.dx-conq-barra i{display:block;height:100%;background:var(--dx-forte);transform-origin:left}
+.dx-conq-txt em{font:600 10.5px/1 var(--f-num,var(--f-ui));font-style:normal;color:var(--dx-txt3);margin-top:6px}
+.dx-conq-ok,.dx-conq-lock{flex:none;width:18px;height:18px;color:var(--dx-txt3)}
+.dx-conq-ok{color:#3fb47a}
+.dx-conq-ok svg,.dx-conq-lock svg{width:100%;height:100%}
+#aiChat .dx-conqs-chat{margin-top:10px}
+.dx-conq-pop{position:fixed;left:50%;top:18px;z-index:2147483100;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border-radius:20px;
+  background:var(--dx-bg);color:var(--dx-txt);border:1px solid var(--dx-borda);box-shadow:var(--dx-sombra);transform:translateX(-50%)}
+.dx-conq-pop-ava{width:44px;height:50px;display:grid;place-items:center;border-radius:14px;background:var(--dx-sup)}
+.dx-conq-pop-ava .dex-svg{width:40px}
+.dx-conq-pop small{display:block;font:600 10px/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--dx-txt3)}
+.dx-conq-pop b{display:block;margin-top:4px;font:650 15px/1.1 var(--f-ui);color:var(--dx-forte)}
+.dx-conq-pop button{all:unset;cursor:pointer;margin-left:6px;padding:9px 14px;border-radius:999px;background:var(--dx-inv);color:var(--dx-inv-txt);font:600 12.5px/1 var(--f-ui)}
 
 /* ============ 11. CELULAR, MODO LEVE E MOVIMENTO REDUZIDO ============ */
 @media (max-width:760px){

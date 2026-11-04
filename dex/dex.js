@@ -38,7 +38,7 @@
   function mil(n){ n=n||0; return n>=1000?(n/1000).toFixed(n>=10000?0:1).replace('.',',')+' mil':String(n); }
   function seg1(ms){ return (ms/1000).toFixed(1).replace('.',',')+' s'; }
   function num(f){ try{ return f(); }catch(e){ return null; } }
-  var IC={x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  var IC={ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',cadeado:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     esq:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
     dir:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
     eng:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'};
@@ -54,9 +54,29 @@
   var FANT={cab:[['nenhum','Nenhum'],['antena','Antena'],['festa','Festa'],['natal','Papai Noel'],['coelho','Coelho'],['formatura','Formatura'],['chef','Chef'],['coroa','Coroa'],['fones','Fones']],
     rosto:[['nenhum','Nenhum'],['oculos','Óculos'],['escuros','Óculos escuros'],['bigode','Bigode']],
     corpo:[['nenhum','Nenhuma'],['gravata','Gravata'],['cachecol','Cachecol'],['noel','Roupa de Noel']]};
+  /* fantasias desbloqueáveis: cada uma tem um jeito diferente de ganhar */
+  var EXTRAS=[
+    ['ninja','Ninja',{cab:'ninja',rosto:'ninja',corpo:'faixa'},'Faça o tour completo do site','tour'],
+    ['lutador','Lutador',{cab:'lutador',rosto:'nenhum',corpo:'kimono'},'Cutuque o Dex 15 vezes','cliques',15],
+    ['samurai','Samurai',{cab:'samurai',rosto:'nenhum',corpo:'armadura'},'Gere as artes de um mês','arte'],
+    ['pirata','Pirata',{cab:'pirata',rosto:'tapa',corpo:'colete'},'Baixe um ZIP com as artes','zip'],
+    ['mago','Mago',{cab:'mago',rosto:'oculos',corpo:'manto'},'Converse com o Dex 10 vezes','conversas',10],
+    ['astronauta','Astronauta',{cab:'astronauta',rosto:'nenhum',corpo:'traje'},'Use o Dex depois das 22h','noite'],
+    ['heroi','Herói',{cab:'nenhum',rosto:'heroi',corpo:'capa'},'Abra o AkiCut em 3 dias diferentes','dias',3],
+    ['cowboy','Cowboy',{cab:'cowboy',rosto:'bigode',corpo:'lenco'},'Segredo: diga no chat a palavra que eu mais falo','segredo']];
+  var CONQ=(function(){ try{ return JSON.parse(LS.get('dex-conquistas','{}'))||{}; }catch(e){ return {}; } })(); CONQ.tem=CONQ.tem||{}; CONQ.n=CONQ.n||{};
+  function salvarConq(){ LS.set('dex-conquistas',JSON.stringify(CONQ)); }
+  function liberado(id){ return !!CONQ.tem[id]; }
+  var PECA_EXTRA={}; EXTRAS.forEach(function(x){ ['cab','rosto','corpo'].forEach(function(k){ var v=x[2][k]; if(v!=='nenhum'&&!/^(oculos|bigode)$/.test(v)) PECA_EXTRA[k+':'+v]=x[0]; }); });
+  FANT.cab=FANT.cab.concat([['ninja','Faixa ninja'],['lutador','Faixa vermelha'],['samurai','Elmo samurai'],['pirata','Chapéu pirata'],['mago','Chapéu de mago'],['astronauta','Capacete espacial'],['cowboy','Chapéu de cowboy']]);
+  FANT.rosto=FANT.rosto.concat([['ninja','Máscara ninja'],['tapa','Tapa-olho'],['heroi','Máscara de herói']]);
+  FANT.corpo=FANT.corpo.concat([['faixa','Faixa'],['kimono','Kimono'],['armadura','Armadura'],['colete','Colete'],['manto','Manto'],['traje','Traje espacial'],['capa','Capa'],['lenco','Lenço']]);
   var TEMAS=[['Clássico',{cab:'nenhum',rosto:'nenhum',corpo:'nenhum'}],['Natal',{cab:'natal',rosto:'nenhum',corpo:'noel'}],['Páscoa',{cab:'coelho',rosto:'nenhum',corpo:'gravata'}],
     ['Formatura',{cab:'formatura',rosto:'nenhum',corpo:'gravata'}],['Festa',{cab:'festa',rosto:'oculos',corpo:'nenhum'}],['Chef',{cab:'chef',rosto:'bigode',corpo:'cachecol'}],
-    ['DJ',{cab:'fones',rosto:'escuros',corpo:'nenhum'}],['Realeza',{cab:'coroa',rosto:'bigode',corpo:'cachecol'}]];
+    ['DJ',{cab:'fones',rosto:'escuros',corpo:'nenhum'}],['Realeza',{cab:'coroa',rosto:'bigode',corpo:'cachecol'}]].concat(EXTRAS.map(function(x){ return [x[1],x[2],x[0]]; }));
+  function proxLivre(i,d){ for(var n=1;n<=TEMAS.length;n++){ var j=((i+d*n)%TEMAS.length+TEMAS.length)%TEMAS.length; if(temaLivre(j)) return j; } return 0; }
+  function temaLivre(i){ var t=TEMAS[i]; return !t[2]||liberado(t[2]); }
+  function pecaLivre(k,v){ var id=PECA_EXTRA[k+':'+v]; return !id||liberado(id); }
   function temaAtual(){ for(var i=0;i<TEMAS.length;i++){ var t=TEMAS[i][1]; if(t.cab===CFG.cab&&t.rosto===CFG.rosto&&t.corpo===CFG.corpo) return i; } return -1; }
   /* fantasia da época: Natal em dezembro e Páscoa perto do domingo de Páscoa, quando nenhuma fantasia foi escolhida */
   function pascoa(a){ var b=a%19,c=Math.floor(a/100),d=a%100,e=Math.floor(c/4),f=c%4,g=Math.floor((c+8)/25),h=Math.floor((c-g+1)/3),i=(19*b+c-e-h+15)%30,k=Math.floor(d/4),l=d%4,m=(32+2*f+2*k-i-l)%7,n=Math.floor((b+11*i+22*m)/451),mes=Math.floor((i+m-7*n+114)/31),dia=((i+m-7*n+114)%31)+1; return new Date(a,mes-1,dia); }
@@ -70,7 +90,7 @@
   }
 
   /* =================================================================== 3. DESENHO */
-  var uid=0, ALTOS={antena:1,festa:1,natal:1,coelho:1,formatura:1,chef:1,coroa:1,fones:1};
+  var uid=0, ALTOS={antena:1,festa:1,natal:1,coelho:1,formatura:1,chef:1,coroa:1,fones:1,samurai:1,astronauta:1,pirata:1,mago:1,cowboy:1,ninja:1,lutador:1};
   var TRONCO='M80 90C108 90 121 105 119.5 128C118 152 101 166 80 166C59 166 42 152 40.5 128C39 105 52 90 80 90Z';
   var CAB_ATRAS='<g class="dex-cab dex-cab-antena"><path d="M80 13V2"/><circle cx="80" cy="1" r="4.5"/></g>'+
     '<g class="dex-cab dex-cab-coelho"><g transform="rotate(-16 58 18)"><rect class="dx-pele" x="47" y="-38" width="22" height="58" rx="11"/><rect x="52.5" y="-30" width="11" height="42" rx="5.5" fill="#F2B8C6"/></g>'+
@@ -87,17 +107,45 @@
     '<g class="dex-cab dex-cab-coroa"><path class="dx-l" fill="#E7B96A" d="M50 20L46 -6L62 6L80 -12L98 6L114 -6L110 20Z"/><circle cx="80" cy="-12" r="3.5" fill="#FFFFFF"/><circle cx="46" cy="-6" r="3" fill="#FFFFFF"/><circle cx="114" cy="-6" r="3" fill="#FFFFFF"/><circle cx="80" cy="11" r="3.6" fill="#D7323F"/></g>'+
     '<g class="dex-cab dex-cab-fones"><path d="M20 52C18 -2 142 -2 140 52" fill="none" stroke="#1B1D22" stroke-width="7" stroke-linecap="round"/>'+
       '<rect class="dx-l" x="5" y="35" width="25" height="44" rx="11" fill="#1B1D22"/><rect class="dx-l" x="130" y="35" width="25" height="44" rx="11" fill="#1B1D22"/>'+
-      '<rect x="10.5" y="46" width="6" height="22" rx="3" fill="#5A5F69"/><rect x="143.5" y="46" width="6" height="22" rx="3" fill="#5A5F69"/></g>';
+      '<rect x="10.5" y="46" width="6" height="22" rx="3" fill="#5A5F69"/><rect x="143.5" y="46" width="6" height="22" rx="3" fill="#5A5F69"/></g>'+
+    /* fantasias que se desbloqueiam (desenhos originais) */
+    '<g class="dex-cab dex-cab-ninja"><path class="dx-l" d="M136 22C146 22 152 18 158 12C156 22 150 28 140 30C150 32 156 40 158 48C150 42 144 36 136 32Z" fill="#2B2F36"/><rect class="dx-l" x="23" y="17" width="115" height="13" rx="6.5" fill="#2B2F36"/><path d="M34 21H128" stroke="#4A4F58" stroke-width="2" stroke-linecap="round"/></g>'+
+    '<g class="dex-cab dex-cab-lutador"><path class="dx-l" d="M24 22C14 22 8 26 2 34C10 30 16 30 22 32C14 38 10 46 10 56C16 46 22 40 26 34Z" fill="#B23A3A"/><rect class="dx-l" x="22" y="17" width="116" height="12" rx="6" fill="#B23A3A"/></g>'+
+    '<g class="dex-cab dex-cab-samurai"><path class="dx-l" d="M16 42Q12 60 22 70L34 58Z M144 42Q148 60 138 70L126 58Z" fill="#2B2F36"/><path class="dx-l" d="M20 46C20 14 50 4 80 4C110 4 140 14 140 46Q80 36 20 46Z" fill="#2F333A"/>'+
+      '<path d="M30 40Q80 30 130 40" fill="none" stroke="#C9A45C" stroke-width="2.4"/><path class="dx-l" d="M80 12L58 -22L67 -24L80 0L93 -24L102 -22Z" fill="#C9A45C"/><circle class="dx-l" cx="80" cy="12" r="5" fill="#C9A45C"/></g>'+
+    '<g class="dex-cab dex-cab-astronauta"><circle cx="80" cy="50" r="70" fill="#BFD3E6" fill-opacity=".12" stroke="#E3E8EE" stroke-width="3.5"/><path d="M34 22C44 10 58 4 72 2" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="5" stroke-linecap="round"/>'+
+      '<path d="M120 -6V-26" stroke="#9AA1AC" stroke-width="3" stroke-linecap="round"/><circle cx="120" cy="-29" r="4" fill="#E0A33A" stroke="#24272D" stroke-width="2"/></g>'+
+    '<g class="dex-cab dex-cab-pirata"><path class="dx-l" d="M26 20C30 -4 54 -12 80 -12C106 -12 130 -4 134 20Q80 30 26 20Z" fill="#1E2126"/><path d="M20 20Q80 36 140 20" fill="none" stroke="#C9A45C" stroke-width="3" stroke-linecap="round"/>'+
+      '<circle cx="80" cy="3" r="5.5" fill="#F6F7F9"/><circle cx="78" cy="2" r="1.2" fill="#1E2126"/><circle cx="82" cy="2" r="1.2" fill="#1E2126"/><path d="M70 10L90 16M90 10L70 16" stroke="#F6F7F9" stroke-width="2.4" stroke-linecap="round"/></g>'+
+    '<g class="dex-cab dex-cab-mago"><path class="dx-l" d="M34 18L76 -62Q82 -70 90 -60L104 -40L96 -42L126 18Z" fill="#2E3A63"/><ellipse class="dx-l" cx="80" cy="18" rx="56" ry="8" fill="#26304F"/>'+
+      '<path d="M74 -20l2 4.6 4.6 2-4.6 2-2 4.6-2-4.6-4.6-2 4.6-2z M92 -2l1.4 3.2 3.2 1.4-3.2 1.4-1.4 3.2-1.4-3.2-3.2-1.4 3.2-1.4z M60 4l1.2 2.6 2.6 1.2-2.6 1.2-1.2 2.6-1.2-2.6-2.6-1.2 2.6-1.2z" fill="#E3C48D"/></g>'+
+    '<g class="dex-cab dex-cab-cowboy"><path class="dx-l" d="M46 14C44 -12 58 -16 70 -10Q80 -16 90 -10C102 -16 116 -12 114 14Z" fill="#7A5638"/><path d="M48 6Q80 14 112 6" fill="none" stroke="#3A2A1E" stroke-width="5"/>'+
+      '<path class="dx-l" d="M14 12Q80 30 146 12Q154 20 142 24Q80 40 18 24Q6 20 14 12Z" fill="#8B6442"/></g>';
   var ROSTO_ACESS='<g class="dex-ros dex-ros-oculos"><circle cx="62" cy="51" r="14" fill="none" stroke="#F6F7F9" stroke-width="3"/><circle cx="98" cy="51" r="14" fill="none" stroke="#F6F7F9" stroke-width="3"/><path d="M76 49Q80 46 84 49" fill="none" stroke="#F6F7F9" stroke-width="3"/></g>'+
     '<g class="dex-ros dex-ros-escuros"><path d="M43 41H78V52Q78 63 66 63H56Q43 63 43 52Z" fill="#050607" fill-opacity=".86" stroke="#F6F7F9" stroke-width="2"/><path d="M82 41H117V52Q117 63 104 63H94Q82 63 82 52Z" fill="#050607" fill-opacity=".86" stroke="#F6F7F9" stroke-width="2"/>'+
       '<path d="M78 45H82" stroke="#F6F7F9" stroke-width="2.4"/><path d="M48 46L57 46M87 46L96 46" stroke="#fff" stroke-opacity=".45" stroke-width="2.4" stroke-linecap="round"/></g>'+
-    '<g class="dex-ros dex-ros-bigode"><path d="M80 62C74 57 63 58 58 65C65 63 72 66 80 64C88 66 95 63 102 65C97 58 86 57 80 62Z" fill="#F6F7F9"/></g>';
+    '<g class="dex-ros dex-ros-bigode"><path d="M80 62C74 57 63 58 58 65C65 63 72 66 80 64C88 66 95 63 102 65C97 58 86 57 80 62Z" fill="#F6F7F9"/></g>'+
+    '<g class="dex-ros dex-ros-ninja"><path d="M33 57H127V60Q127 79 104 79H56Q33 79 33 60Z" fill="#23262C" stroke="#14161A" stroke-width="2"/><path d="M48 66Q80 72 112 66" fill="none" stroke="#3A3F47" stroke-width="2" stroke-linecap="round"/></g>'+
+    '<g class="dex-ros dex-ros-tapa"><path d="M30 30L130 70" stroke="#14161A" stroke-width="3"/><ellipse cx="98" cy="52" rx="13" ry="14" fill="#14161A" stroke="#2B2F36" stroke-width="2"/></g>'+
+    '<g class="dex-ros dex-ros-heroi"><path fill-rule="evenodd" d="M38 42Q58 32 80 42Q102 32 122 42Q128 58 112 64Q94 66 80 58Q66 66 48 64Q32 58 38 42Z M62 39a11 12 0 1 0 .1 0Z M98 39a11 12 0 1 0 .1 0Z" fill="#1E2126" stroke="#F6F7F9" stroke-width="1.6"/></g>';
   function corpoAcess(u){
     return '<g class="dex-crp dex-crp-noel"><path class="dx-l" d="'+TRONCO+'" fill="#D7323F"/><path d="M58 104C61 98 67 95 72 96" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="5" stroke-linecap="round"/>'+
         '<rect x="38" y="131" width="84" height="11" fill="#1B1D22" clip-path="url(#dexT'+u+')"/><rect x="72" y="129" width="16" height="15" rx="3" fill="none" stroke="#E7B96A" stroke-width="3"/>'+
         '<path d="M80 96V129" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9"/><path d="M56 95Q80 107 104 95" stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none"/></g>'+
       '<g class="dex-crp dex-crp-cachecol"><path class="dx-l" d="M58 92Q80 104 102 92L104 102Q80 116 56 102Z" fill="#D7323F"/><path class="dx-l" d="M90 104L98 136L86 138L80 108Z" fill="#D7323F"/>'+
         '<path d="M64 97Q80 106 96 97" stroke="#fff" stroke-width="3" fill="none" opacity=".85"/><path d="M89 117L95 116M91 127L97 126" stroke="#fff" stroke-width="3"/></g>'+
+      '<g class="dex-crp dex-crp-kimono"><g clip-path="url(#dexT'+u+')"><path d="M58 92L80 130L102 92" fill="none" stroke="#C9CED6" stroke-width="7"/><path d="M58 92L80 130L102 92" fill="none" stroke="#24272D" stroke-width="2"/><rect x="38" y="128" width="84" height="10" fill="#1B1D22"/></g>'+
+        '<path class="dx-l" d="M84 134L92 152L86 154L80 138Z M78 134L68 150L74 153L80 138Z" fill="#1B1D22"/></g>'+
+      '<g class="dex-crp dex-crp-faixa"><g clip-path="url(#dexT'+u+')"><path d="M44 104L118 150" stroke="#23262C" stroke-width="13"/><path d="M38 132H122" stroke="#23262C" stroke-width="8"/></g><path d="M96 124l2.4 5.6 5.6 2.4-5.6 2.4-2.4 5.6-2.4-5.6-5.6-2.4 5.6-2.4z" fill="#9AA1AC" stroke="#24272D" stroke-width="1.4"/></g>'+
+      '<g class="dex-crp dex-crp-armadura"><g clip-path="url(#dexT'+u+')"><rect x="38" y="104" width="84" height="13" fill="#2F333A"/><rect x="38" y="120" width="84" height="13" fill="#2F333A"/><rect x="38" y="136" width="84" height="13" fill="#2F333A"/>'+
+        '<path d="M50 110H110M50 126H110M50 142H110" stroke="#B23A3A" stroke-width="2" stroke-dasharray="4 5"/></g></g>'+
+      '<g class="dex-crp dex-crp-traje"><path d="M56 93Q80 105 104 93" fill="none" stroke="#9AA1AC" stroke-width="7" stroke-linecap="round"/><rect class="dx-l" x="64" y="112" width="32" height="20" rx="4" fill="#DDE3EA"/>'+
+        '<circle cx="72" cy="119" r="2.6" fill="#B23A3A"/><circle cx="80" cy="119" r="2.6" fill="#E0A33A"/><circle cx="88" cy="119" r="2.6" fill="#4A6890"/><rect x="70" y="125" width="20" height="3" rx="1.5" fill="#9AA1AC"/></g>'+
+      '<g class="dex-crp dex-crp-colete"><path class="dx-l" d="M45 106Q52 96 68 93L74 150Q58 150 46 138Z" fill="#3A2E28"/><path class="dx-l" d="M115 106Q108 96 92 93L86 150Q102 150 114 138Z" fill="#3A2E28"/><circle cx="70" cy="118" r="2" fill="#C9A45C"/><circle cx="71" cy="132" r="2" fill="#C9A45C"/></g>'+
+      '<g class="dex-crp dex-crp-manto"><path class="dx-l" d="M38 106Q80 84 122 106L118 122Q80 102 42 122Z" fill="#2E3A63"/><circle class="dx-l" cx="80" cy="100" r="5" fill="#C9A45C"/></g>'+
+      '<g class="dex-crp dex-crp-capa"><path class="dx-l" d="M44 100Q28 140 34 168L50 158Q44 130 54 102Z M116 100Q132 140 126 168L110 158Q116 130 106 102Z" fill="#8E2F35"/><path class="dx-l" d="M54 96Q80 108 106 96L104 104Q80 116 56 104Z" fill="#8E2F35"/>'+
+        '<circle class="dx-l" cx="80" cy="126" r="11" fill="#F6F7F9"/><path d="M76 119V133H80Q86 133 86 126Q86 119 80 119Z" fill="none" stroke="#8E2F35" stroke-width="2.6" stroke-linejoin="round"/></g>'+
+      '<g class="dex-crp dex-crp-lenco"><path class="dx-l" d="M56 92Q80 102 104 92L80 122Z" fill="#A4483F"/><circle cx="72" cy="100" r="1.6" fill="#F6F7F9"/><circle cx="86" cy="101" r="1.6" fill="#F6F7F9"/><circle cx="80" cy="110" r="1.6" fill="#F6F7F9"/></g>'+
       '<g class="dex-crp dex-crp-gravata"><path class="dx-l" d="M80 97L63 89V106Z" fill="#1B1D22"/><path class="dx-l" d="M80 97L97 89V106Z" fill="#1B1D22"/><rect class="dx-l" x="75" y="92" width="10" height="10" rx="3" fill="#2F3239"/></g>';
   }
   /* o brilho dos olhos é um degradê desenhado (antes era um filtro de desfoque, que pesava) */
@@ -294,7 +342,7 @@
   btn.addEventListener('pointerleave',function(){ E.hover=false; render(); if(Math.random()<.35&&humorAtual==='neutro') piscadinha(); });
   btn.addEventListener('click',function(){
     if(E.guia){ if(emTour) proximoPasso(); else fimGuia(); return; }
-    pular(); balao.classList.remove('on');
+    pular(); balao.classList.remove('on'); contar('cliques',15,'lutador');
     if(!aberto()){ setTimeout(abrirChat,90); return; }
     var agora=Date.now(); cliques=cliques.filter(function(t){ return agora-t<1600; }); cliques.push(agora);
     if(cliques.length>=5){ cliques=[]; reagir('tonto',2300); } else reagir('amor',1500);
@@ -400,6 +448,38 @@
   async function estavel(n){ var ult='',iguais=0,t0=performance.now();
     while(performance.now()-t0<1300){ await quadro(); var r=n.getBoundingClientRect(), k=Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width);
       if(k===ult){ if(++iguais>=4) return; } else { iguais=0; ult=k; } } }
+  /* voo de verdade: posição com mola (sem cortes ao mudar de alvo no meio do caminho), um arco suave
+     para cima, inclinação conforme a velocidade e os jatos acesos enquanto se move */
+  var VOO={x:0,y:0,vx:0,vy:0,tx:0,ty:0,a:0,va:0,d0:1,raf:0,ult:0,t0:0,esperas:[]};
+  var inclEl=null;
+  function vooPasso(agora){
+    var dt=Math.min(.034,Math.max(.001,(agora-(VOO.ult||agora))/1000)); VOO.ult=agora;
+    /* arranca devagar (a mola "acorda" em 0,4 s) e tem velocidade máxima: nada de tranco */
+    var ramp=Math.min(1,(agora-VOO.t0)/400), k=parado()?400:44*(.15+.85*ramp*ramp), c=2*Math.sqrt(k)*.9;
+    VOO.vx+=(k*(VOO.tx-VOO.x)-c*VOO.vx)*dt; VOO.vy+=(k*(VOO.ty-VOO.y)-c*VOO.vy)*dt;
+    var vv=Math.hypot(VOO.vx,VOO.vy), VMAX=1700; if(vv>VMAX){ VOO.vx*=VMAX/vv; VOO.vy*=VMAX/vv; }
+    VOO.x+=VOO.vx*dt; VOO.y+=VOO.vy*dt;
+    var resto=Math.hypot(VOO.tx-VOO.x,VOO.ty-VOO.y), pr=1-Math.min(1,resto/VOO.d0), arcoAlvo=-Math.sin(pr*Math.PI)*Math.min(110,VOO.d0*.24);
+    var ka=90, ca=2*Math.sqrt(ka)*.9; VOO.va+=(ka*(arcoAlvo-VOO.a)-ca*VOO.va)*dt; VOO.a+=VOO.va*dt;
+    var vel=Math.hypot(VOO.vx,VOO.vy), lean=Math.max(-18,Math.min(18,VOO.vx*.02));
+    raiz.style.transform='translate3d('+VOO.x.toFixed(1)+'px,'+(VOO.y+VOO.a).toFixed(1)+'px,0)';
+    if(!inclEl) inclEl=raiz.querySelector('.dex-incl');
+    if(inclEl) inclEl.style.transform='rotate('+lean.toFixed(2)+'deg) scale('+(1+Math.min(.06,vel/9000)).toFixed(3)+','+(1-Math.min(.05,vel/11000)).toFixed(3)+')';
+    raiz.classList.toggle('voando',vel>60);
+    if(resto<.7&&vel<6&&Math.abs(VOO.a)<.7){
+      VOO.x=VOO.tx; VOO.y=VOO.ty; VOO.vx=VOO.vy=VOO.a=VOO.va=0; VOO.raf=0; VOO.ult=0;
+      raiz.style.transform=(VOO.x||VOO.y)?'translate3d('+VOO.x.toFixed(1)+'px,'+VOO.y.toFixed(1)+'px,0)':'';
+      if(inclEl) inclEl.style.transform=''; raiz.classList.remove('voando','dex-voo-js');
+      var es=VOO.esperas; VOO.esperas=[]; es.forEach(function(f){ f(); }); return;
+    }
+    VOO.raf=requestAnimationFrame(vooPasso);
+  }
+  function voarPara(x,y){
+    var d=Math.hypot(x-VOO.x,y-VOO.y); if(d>30){ VOO.d0=d; if(Math.hypot(x-VOO.tx,y-VOO.ty)>30&&Math.hypot(VOO.vx,VOO.vy)<300) VOO.t0=performance.now(); } VOO.tx=x; VOO.ty=y;
+    raiz.style.transition='none'; raiz.classList.add('dex-voo-js');
+    if(!VOO.raf){ VOO.ult=0; VOO.raf=requestAnimationFrame(vooPasso); }
+    return new Promise(function(ok){ VOO.esperas.push(ok); setTimeout(ok,2200); });
+  }
   function homeRect(){ var t=raiz.style.transform; raiz.style.transition='none'; raiz.style.transform='none'; var r=raiz.getBoundingClientRect(); raiz.style.transform=t; void raiz.offsetWidth; raiz.style.transition=''; return r; }
   function furo(x,y,w,h,r){ var X=innerWidth,Y=innerHeight; r=Math.min(r,w/2,h/2);
     return 'path(evenodd, "M0 0H'+X+'V'+Y+'H0Z M'+(x+r)+' '+y+'H'+(x+w-r)+'A'+r+' '+r+' 0 0 1 '+(x+w)+' '+(y+r)+'V'+(y+h-r)+'A'+r+' '+r+' 0 0 1 '+(x+w-r)+' '+(y+h)+'H'+(x+r)+'A'+r+' '+r+' 0 0 1 '+x+' '+(y+h-r)+'V'+(y+r)+'A'+r+' '+r+' 0 0 1 '+(x+r)+' '+y+'Z")'; }
@@ -419,8 +499,7 @@
     var dir=r.right+Wd*.95+14<innerWidth, braco=dir?'e':'d';
     var left=dir?r.right+14+Wd*.078:r.left-14-Wd*1.08, cy=r.top+r.height/2, top=Math.max(8,Math.min(innerHeight-Hd-8,cy-Hd*.6215));
     left=Math.max(8,Math.min(innerWidth-Wd-8,left));
-    raiz.style.setProperty('--lean',(left<casa.left?-12:12)+'deg');
-    raiz.style.transform='translate3d('+(left-casa.left).toFixed(1)+'px,'+(top-casa.top).toFixed(1)+'px,0)';
+    VOO.prox=voarPara(left-casa.left,top-casa.top);
     var paraDir=dir&&left+Wd+240<innerWidth;
     raiz.classList.toggle('balao-dir',paraDir); raiz.classList.toggle('balao-esq',!paraDir); raiz.classList.toggle('balao-baixo',top<150);
     var sx=left+Wd*(braco==='e'?35.5:124.5)/160, sy=top+Hd*133/214, tx=Math.max(r.left,Math.min(r.right,sx)), ty=Math.max(r.top,Math.min(r.bottom,sy));
@@ -437,11 +516,11 @@
     if(r0.top<70||r0.bottom>innerHeight-110){ try{ alvo.scrollIntoView({block:'center',behavior:parado()?'auto':'smooth'}); }catch(e){} await estavel(alvo); if(vez!==guiaVez) return false; }
     H.classList.add('dex-guia'); balao.classList.remove('on'); E.dormindo=false;
     alvoGuia=alvo; textoGuia=texto||a[2];
-    raiz.classList.add('voando'); E.guia='voando'; render();
-    raiz.style.transition='transform '+(parado()?1:950)+'ms var(--mola,ease)';
+    E.guia='voando'; render();
     posicionar(true);
-    await esperar(parado()?30:900); if(vez!==guiaVez) return false;
-    raiz.classList.remove('voando'); E.guia='apontando'; render(); olharElemento(alvo,99999); truque('quica');
+    /* chega mais devagar no fim: só aponta quando parou de verdade */
+    await Promise.race([VOO.prox,esperar(2100)]); if(vez!==guiaVez) return false;
+    E.guia='apontando'; render(); olharElemento(alvo,99999); truque('quica');
     falarBalao(textoGuia,0,true);
     return true;
   }
@@ -455,13 +534,12 @@
     clearTimeout(guiaTimer); guiaVez++; emTour=false; alvoGuia=null; ultCaixa=null;
     if(veu){ veu.classList.remove('on'); anel.classList.remove('on'); }
     fecharHudTour(); balao.classList.remove('on','x');
-    raiz.style.transition='transform '+(parado()?1:950)+'ms var(--mola,ease)'; raiz.style.transform='';
-    raiz.classList.remove('balao-dir','balao-esq','balao-baixo'); raiz.classList.add('voando');
+    raiz.classList.remove('balao-dir','balao-esq','balao-baixo');
     E.guia='voando'; render(); olhandoAte=0;
-    var v=guiaVez; setTimeout(function(){ if(v!==guiaVez) return; raiz.classList.remove('voando'); E.guia=null; render(); olharPara(0,0,0); H.classList.remove('dex-guia'); reagir('feliz',900); cacheRect(); },parado()?40:950);
+    var v=guiaVez; voarPara(0,0).then(function(){ if(v!==guiaVez) return; E.guia=null; render(); olharPara(0,0,0); H.classList.remove('dex-guia'); reagir('feliz',900); truque('quica'); cacheRect(); });
   }
   var tReposi=0;
-  function reposicionar(){ if(!alvoGuia) return; cancelAnimationFrame(tReposi); tReposi=requestAnimationFrame(function(){ raiz.style.transition='transform .5s var(--mola,ease)'; posicionar(false); }); }
+  function reposicionar(){ if(!alvoGuia) return; cancelAnimationFrame(tReposi); tReposi=requestAnimationFrame(function(){ posicionar(false); }); }
   W.addEventListener('resize',reposicionar); W.addEventListener('scroll',reposicionar,{passive:true,capture:true});
   W.addEventListener('keydown',function(e){ if(!E.guia) return; if(e.key==='Escape') fimGuia(); else if(emTour&&e.key==='ArrowRight') proximoPasso(); else if(emTour&&e.key==='ArrowLeft') passoAnterior(); });
   D.addEventListener('pointerdown',function(e){ if(E.guia&&!emTour&&!raiz.contains(e.target)) fimGuia(); },true);
@@ -498,7 +576,7 @@
     var i2=h.querySelector('.dx-tour-barra i'); barraAnim=i2.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:6500,easing:'linear',fill:'forwards'});
     barraAnim.onfinish=function(){ if(emTour) proximoPasso(); };
   }
-  function proximoPasso(){ if(!emTour) return; if(passo>=PASSOS.length-1){ var t=abaAntesTour; fimGuia(); if(t&&W.setTab) setTimeout(function(){ W.setTab(t); },300); return; } irPasso(passo+1); }
+  function proximoPasso(){ if(!emTour) return; if(passo>=PASSOS.length-1){ var t=abaAntesTour; fimGuia(); setTimeout(function(){ conquistar('ninja'); },1400); if(t&&W.setTab) setTimeout(function(){ W.setTab(t); },300); return; } irPasso(passo+1); }
   function passoAnterior(){ if(emTour&&passo>0) irPasso(passo-1); }
   function tour(){ if(emTour) return; clearTimeout(guiaTimer); abaAntesTour=typeof state!=='undefined'?state.tab:null; emTour=true; irPasso(0); }
 
@@ -629,7 +707,7 @@
     else if(k==='__leve') M.definirLeve(v);
     else { CFG[k]=v; salvar(); aplicarCfg(); }
   }
-  function grade(tipo){ return '<div class="dx-grade" data-g="'+tipo+'">'+FANT[tipo].map(function(o){ return '<button type="button" class="dx-card dx-toque" data-v="'+o[0]+'" aria-pressed="'+(CFG[tipo]===o[0])+'">'+miniatura(tipo,o[0])+'<span>'+esc(o[1])+'</span></button>'; }).join('')+'</div>'; }
+  function grade(tipo){ return '<div class="dx-grade" data-g="'+tipo+'">'+FANT[tipo].filter(function(o){ return pecaLivre(tipo,o[0]); }).map(function(o){ return '<button type="button" class="dx-card dx-toque" data-v="'+o[0]+'" aria-pressed="'+(CFG[tipo]===o[0])+'">'+miniatura(tipo,o[0])+'<span>'+esc(o[1])+'</span></button>'; }).join('')+'</div>'; }
   function montarEstudio(){
     est=D.createElement('dialog'); est.id='dexStudio'; est.className='dx-est'; est.setAttribute('aria-label','Estúdio do Dex');
     var i=temaAtual();
@@ -647,8 +725,9 @@
             '<span class="dx-rot">Lado da tela</span>'+seg('lado',[['direita','Direita'],['esquerda','Esquerda']])+
             '<span class="dx-rot">Tema do chat</span><div class="dx-temas">'+TEMAS_CHAT.map(function(t){ return '<button type="button" class="dx-tema dx-toque" data-tc="'+t[0]+'" aria-pressed="'+(CFG.tema===t[0])+'"><i style="background:'+t[2]+'"></i>'+t[1]+'</button>'; }).join('')+'</div>'+
             '<p class="dx-nota">Vale para o chat, o painel de consumo, o estúdio e os carregamentos.</p></div>'+
-          '<div class="dx-painel" data-p="fantasias" hidden><span class="dx-rot">Temas prontos</span><div class="dx-carrossel">'+TEMAS.map(function(t,n){ return '<button type="button" class="dx-card dx-toque" data-t="'+n+'" aria-pressed="'+(n===i)+'">'+miniatura('tema',t[1])+'<span>'+t[0]+'</span></button>'; }).join('')+'</div>'+
+          '<div class="dx-painel" data-p="fantasias" hidden><span class="dx-rot">Temas prontos</span><div class="dx-carrossel">'+TEMAS.map(function(t,n){ var tr=!temaLivre(n); return '<button type="button" class="dx-card dx-toque'+(tr?' trancado':'')+'" data-t="'+n+'" aria-pressed="'+(n===i)+'"'+(tr?' title="Bloqueado"':'')+'>'+miniatura('tema',t[1])+(tr?'<i class="dx-cadeado">'+IC.cadeado+'</i>':'')+'<span>'+(tr?'Bloqueado':t[0])+'</span></button>'; }).join('')+'</div>'+
             '<span class="dx-rot">Cabeça</span>'+grade('cab')+'<span class="dx-rot">Rosto</span>'+grade('rosto')+'<span class="dx-rot">Roupa</span>'+grade('corpo')+
+            '<span class="dx-rot">Conquistas</span><div class="dx-conqs">'+htmlConquistas()+'</div>'+
             '<span class="dx-rot">Época</span><div class="dx-lista">'+sw('epoca','Fantasia da época automática','Papai Noel em dezembro e coelho na Páscoa, quando nenhuma fantasia está escolhida')+'</div></div>'+
           '<div class="dx-painel" data-p="conversa" hidden><span class="dx-rot">Jeito de conversar</span><div class="dx-jeitos">'+
             [['divertido','Divertido','"Bip-bop! Bora deixar essas artes prontas?"'],['equilibrado','Equilibrado','"Claro! Vou te mostrar onde fica."'],['formal','Formal','"Certamente. Siga os passos abaixo."']].map(function(j){ return '<button type="button" class="dx-jeito dx-toque" data-j="'+j[0]+'" aria-pressed="'+(CFG.jeito===j[0])+'"><b>'+j[1]+'</b><span>'+j[2]+'</span></button>'; }).join('')+'</div>'+
@@ -675,15 +754,17 @@
     est.querySelectorAll('.dx-tema').forEach(function(b){ b.onclick=function(){ definir('tema',b.dataset.tc); marcarEstudio(true); reagir('surpresa',600); setTimeout(function(){ reagir('feliz',900); },600); }; });
     est.querySelectorAll('.dx-jeito').forEach(function(b){ b.onclick=function(){ definir('jeito',b.dataset.j); marcarEstudio(true); reagir(b.dataset.j==='divertido'?'comemorando':b.dataset.j==='formal'?'surpresa':'feliz',1200); }; });
     est.querySelectorAll('.dx-grade').forEach(function(g){ g.querySelectorAll('.dx-card').forEach(function(b){ b.onclick=function(){ CFG[g.dataset.g]=b.dataset.v; salvar(); aplicarCfg(); marcarEstudio(true); estalo(b); reagir(b.dataset.v==='natal'?'comemorando':'amor',1200); pular(); }; }); });
-    est.querySelectorAll('.dx-carrossel .dx-card').forEach(function(b){ b.onclick=function(){ trocarFantasiaVisual(+b.dataset.t); estalo(b); }; });
-    est.querySelectorAll('[data-tm]').forEach(function(b){ b.onclick=function(){ var i=temaAtual(); trocarFantasiaVisual(((i<0?0:i)+(+b.dataset.tm)+TEMAS.length)%TEMAS.length,+b.dataset.tm); }; });
+    est.querySelectorAll('.dx-carrossel .dx-card').forEach(function(b){ b.onclick=function(){ var n=+b.dataset.t;
+      if(!temaLivre(n)){ var x=EXTRAS.filter(function(e){ return e[0]===TEMAS[n][2]; })[0]; M.anima(b,[{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],'rapida'); reagir('pensando',1400); if(x) falarBalao('Para liberar o <b>'+esc(x[1])+'</b>: '+esc(x[3])+'.',3400,true); return; }
+      trocarFantasiaVisual(n); estalo(b); }; });
+    est.querySelectorAll('[data-tm]').forEach(function(b){ b.onclick=function(){ var i=temaAtual(); trocarFantasiaVisual(proxLivre(i<0?0:i,+b.dataset.tm),+b.dataset.tm); }; });
     M.arrastar(est.querySelector('.dx-carrossel'));
     /* arrastar o Dex no palco troca a fantasia */
     var x0=null,vx=0,lt=0,lx=0;
     palco.addEventListener('pointerdown',function(e){ if(e.target.closest('button,input')) return; x0=lx=e.clientX; lt=performance.now(); vx=0; palco.setPointerCapture(e.pointerId); palco.classList.add('arrastando'); });
     palco.addEventListener('pointermove',function(e){ if(x0==null) return; var dx=e.clientX-x0; dexBox.style.transform='translateX('+(dx*.7)+'px) rotate('+(dx*.04)+'deg)'; var t=performance.now(); vx=(e.clientX-lx)/Math.max(1,t-lt); lx=e.clientX; lt=t; });
     var fim=function(e){ if(x0==null) return; var dx=e.clientX-x0; x0=null; palco.classList.remove('arrastando');
-      if(Math.abs(dx)>70||Math.abs(vx)>.6){ var d=dx<0?1:-1, i=temaAtual(); trocarFantasiaVisual(((i<0?0:i)+d+TEMAS.length)%TEMAS.length,d,dx*.7); }
+      if(Math.abs(dx)>70||Math.abs(vx)>.6){ var d=dx<0?1:-1, i=temaAtual(); trocarFantasiaVisual(proxLivre(i<0?0:i,d),d,dx*.7); }
       else { M.anima(dexBox,[{transform:dexBox.style.transform||'none'},{transform:'none'}],'pula'); dexBox.style.transform=''; if(Math.abs(dx)<5){ truque('pirueta',[dexBox.querySelector('.dex-corpo')]); reagir('feliz',1100); } } };
     palco.addEventListener('pointerup',fim); palco.addEventListener('pointercancel',fim);
     aplicarVisual();
@@ -756,7 +837,35 @@
     requestAnimationFrame(function(){ pilula(est.querySelector('.dx-abas'),false); marcarEstudio(false); });
     aplicarVisual(); setTimeout(function(){ reagir('surpresa',500); setTimeout(function(){ reagir('feliz',1200); truque('pula',[est.querySelector('.dx-est-dex .dex-corpo')]); },500); },200);
   }
-  function fecharEstudio(){ if(!est||!est.open) return; var a=M.anima(est,[{opacity:1,transform:'none'},{opacity:0,transform:'scale(.96) translateY(10px)'}],'rapida',{fill:'forwards'}); var f=function(){ try{ est.close(); }catch(e){} if(a) a.cancel(); }; if(a) a.finished.then(f,f); else f(); }
+  function fecharEstudio(){ if(!est||!est.open) return; if(remontar){ remontar=false; var velhoEst=est; setTimeout(function(){ if(!velhoEst.open){ velhoEst.remove(); if(est===velhoEst) est=null; } },600); } var a=M.anima(est,[{opacity:1,transform:'none'},{opacity:0,transform:'scale(.96) translateY(10px)'}],'rapida',{fill:'forwards'}); var f=function(){ try{ est.close(); }catch(e){} if(a) a.cancel(); }; if(a) a.finished.then(f,f); else f(); }
+  /* =================================================================== 10b. CONQUISTAS */
+  function progresso(x){ if(!x[5]) return null; var v=x[4]==='dias'?(CONQ.dias||[]).length:(CONQ.n[x[4]]||0); return [Math.min(v,x[5]),x[5]]; }
+  function htmlConquistas(){
+    return EXTRAS.map(function(x){ var ok=liberado(x[0]), pg=progresso(x);
+      return '<div class="dx-conq'+(ok?' ok':'')+'"><span class="dx-conq-ava">'+miniatura('tema',x[2])+'</span><div class="dx-conq-txt"><b>'+(ok?esc(x[1]):'??? · '+esc(x[1].charAt(0))+'…')+'</b><small>'+(ok?'Desbloqueado':esc(x[3]))+'</small>'+
+        (!ok&&pg?'<i class="dx-conq-barra"><i style="transform:scaleX('+(pg[0]/pg[1]).toFixed(3)+')"></i></i><em>'+pg[0]+'/'+pg[1]+'</em>':'')+'</div>'+(ok?'<span class="dx-conq-ok">'+IC.ok+'</span>':'<span class="dx-conq-lock">'+IC.cadeado+'</span>')+'</div>'; }).join('');
+  }
+  function contar(chave,meta,id){ CONQ.n[chave]=(CONQ.n[chave]||0)+1; salvarConq(); if(CONQ.n[chave]>=meta) conquistar(id); }
+  var remontar=false;
+  function conquistar(id){
+    if(liberado(id)) return; var x=EXTRAS.filter(function(e){ return e[0]===id; })[0]; if(!x) return;
+    CONQ.tem[id]=Date.now(); salvarConq();
+    if(est){ if(est.open) remontar=true; else { est.remove(); est=null; } }
+    reagir('comemorando',2200); truque('pirueta');
+    /* aviso no topo com o Dex já vestido */
+    var pop=el('div','dx-conq-pop'); pop.setAttribute('role','status');
+    pop.innerHTML='<span class="dx-conq-pop-ava">'+miniatura('tema',x[2])+'</span><div><small>Fantasia desbloqueada</small><b>'+esc(x[1])+'</b></div><button type="button">Vestir</button>';
+    D.body.appendChild(pop);
+    M.anima(pop,[{opacity:0,transform:'translateX(-50%) translateY(-30px) scale(.85)'},{opacity:1,transform:'translateX(-50%)'}],'pula');
+    var sair=function(){ if(!pop.parentNode) return; var a=M.anima(pop,[{opacity:1,transform:'translateX(-50%)'},{opacity:0,transform:'translateX(-50%) translateY(-20px) scale(.94)'}],'rapida',{fill:'forwards'}); var f=function(){ pop.remove(); }; if(a) a.finished.then(f,f); else f(); };
+    pop.querySelector('button').onclick=function(){ CFG.cab=x[2].cab; CFG.rosto=x[2].rosto; CFG.corpo=x[2].corpo; salvar(); aplicarCfg(); reagir('feliz',1400); pular(); sair(); };
+    setTimeout(sair,6500);
+    falarBalao(CFG.jeito==='formal'?'Nova fantasia disponível: <b>'+esc(x[1])+'</b>.':'Uhuul! Ganhei a fantasia <b>'+esc(x[1])+'</b>! Está no Estúdio.',4200,true);
+  }
+  /* dias diferentes de uso e eventos vindos dos carregamentos */
+  (function(){ var hj=new Date().toISOString().slice(0,10); CONQ.dias=CONQ.dias||[]; if(CONQ.dias.indexOf(hj)<0){ CONQ.dias.push(hj); CONQ.dias=CONQ.dias.slice(-30); salvarConq(); } if(CONQ.dias.length>=3) setTimeout(function(){ conquistar('heroi'); },4000); })();
+  W.addEventListener('dex-feito',function(e){ var t=e.detail&&e.detail.tipo; if(t==='arte') setTimeout(function(){ conquistar('samurai'); },900); else if(t==='zip') setTimeout(function(){ conquistar('pirata'); },900); });
+
   /* em Ajustes fica um cartão que abre o estúdio */
   var cartao=null;
   function atualizarCartao(){ if(!cartao) return; var i=temaAtual(); cartao.querySelector('.dx-cartao-ico').innerHTML=miniatura('atual');
@@ -874,6 +983,7 @@
   var RE_LISTA_MES=new RegExp('(aniversariantes?|aniversario|niver|quem faz).*\\b('+MESES_RE+')\\b|\\b('+MESES_RE+')\\b.*(aniversariantes?|aniversario|niver)');
   /* responde no próprio site, sem gastar IA, quando a pergunta é sobre uma pessoa ou um mês */
   function responderLocal(t){
+    if(funcoesExtras(t)) return true;
     var n=normalizar(t), m=n.match(RE_LISTA_MES);
     if(m&&!/\bgera|\bzip|\bbaix/.test(n)){
       var nomeMes=m[2]||m[3], mi=MESES_RE.split('|').indexOf(nomeMes)+1, ano=num(function(){ return state.year; })||new Date().getFullYear();
@@ -910,6 +1020,93 @@
     else if(r.cands.length&&RE_PESSOA.test(normalizar(t))){ o.busca_sem_resultado=true; var pr=parecidos(r.cands); if(pr.length) o.nomes_parecidos=pr.map(function(p){ return p.name; }); }
     if(/aniversari|niver|quem|lista|mes/.test(normalizar(t))) num(function(){ var rec=state.months[mk(state.year,state.month)]; if(rec&&rec.entries.length) o.aniversariantes_do_mes_aberto=rec.entries.slice().sort(function(a,b){ return a.day-b.day; }).slice(0,40).map(function(e){ return String(e.day).padStart(2,'0')+' '+e.name; }); });
     return o;
+  }
+
+  /* =================================================================== 11c. MAIS FUNÇÕES (respondidas no próprio site, sem gastar IA) */
+  var PIADAS=['Por que o robô foi ao médico? Porque estava com um vírus… mas era só atualização pendente.','Eu ia contar uma piada sobre ZIP, mas ela ficou muito compactada.',
+    'Qual é o bolo favorito de um robô? O de chip de chocolate.','Tentei fazer dieta, mas toda vez que vejo uma tesoura eu corto… o carboidrato.','Sabe por que eu nunca me perco? Porque eu sempre sigo o mouse.',
+    'O Chapeleiro me disse que eu tenho cabeça boa. Pena que não cabe chapéu nenhum.'];
+  function enviarTexto(t){ if(!form||!input) return; input.value=t; try{ form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true})); }catch(e){} }
+  function chips(grupos,caixa){ var c=el('div','dx-ajuda'); grupos.forEach(function(g){ var h=el('div','dx-ajuda-g'); h.appendChild(el('span','dx-ajuda-t',esc(g[0]))); var w=el('div','dx-ajuda-c');
+      g[1].forEach(function(x){ var b=el('button','dx-chip-cmd',esc(x[0])); b.type='button'; b.onclick=function(){ if(/ $/.test(x[1])){ input.value=x[1]; form.classList.add('tem-texto'); input.focus(); } else enviarTexto(x[1]); }; w.appendChild(b); }); h.appendChild(w); c.appendChild(h); }); caixa.appendChild(c); rolar(); }
+  function ajuda(){ var b=falaBot(CFG.jeito==='formal'?'Estas são as coisas que posso fazer por você:':'Olha tudo que eu sei fazer (toque para testar):');
+    chips([['Pessoas',[['Quem é…','quem é '],['Próximo aniversariante','próximo aniversariante'],['Fotos com nota baixa','fotos com nota baixa'],['Fora das listas','quem está fora das listas']]],
+      ['Mês e ano',[['Resumo do mês','resumo do mês'],['Pendências','pendências'],['Hoje','hoje'],['Próximos 7 dias','próximos 7 dias'],['Resumo do ano','resumo do ano'],['Copiar a lista','copiar a lista do mês']]],
+      ['Artes',[['Gerar o mês','gerar o mês'],['Baixar arte de…','baixar a arte de '],['Baixar o ZIP','baixar todas zip'],['Espaço no Supabase','espaço']]],
+      ['Dex',[['Tour','/tour'],['Meu consumo','/status'],['Conquistas','conquistas'],['Uma piada','conta uma piada'],['Um truque','faz um truque']]]],b); reagir('feliz',1000); }
+  function mesAberto(){ return num(function(){ return state.months[mk(state.year,state.month)]; }); }
+  function todasEntradas(ano){ var out=[]; num(function(){ Object.keys(state.months).forEach(function(k){ if(ano&&+k.slice(0,4)!==ano) return; (state.months[k].entries||[]).forEach(function(e){ out.push({k:k,e:e}); }); }); }); return out; }
+  function proximoAniv(caixa){
+    var l=todasEntradas().map(function(x){ return {x:x,d:diasAte(x.e.day,x.e.month)}; }).sort(function(a,b){ return a.d-b.d; });
+    if(!l.length){ caixa.appendChild(el('div','dx-nota-chat','Ainda não há listas de aniversariantes.')); return; }
+    var d0=l[0].d, mesmos=l.filter(function(y){ return y.d===d0; }), vistos={};
+    mesmos.forEach(function(y){ var e=y.x.e, kk=normalizar(e.name); if(vistos[kk]) return; vistos[kk]=1; var p=e.personId&&num(function(){ return state.people.find(function(z){ return z.id===e.personId; }); }); cartaoPessoa(p||{id:null,name:e.name,soLista:true},caixa); });
+  }
+  function resumoAno(caixa){
+    var ano=num(function(){ return state.year; })||new Date().getFullYear(), meses=[], max=1;
+    for(var m=1;m<=12;m++){ var rec=num(function(){ return state.months[mk(ano,m)]; }), es=rec&&rec.entries||[], ok=0; es.forEach(function(e){ if(e.status==='ready') ok++; }); meses.push([m,es.length,ok]); max=Math.max(max,es.length); }
+    var tot=meses.reduce(function(a,b){ return a+b[1]; },0), ger=meses.reduce(function(a,b){ return a+b[2]; },0);
+    var c=el('div','dx-ano'); c.innerHTML='<div class="dx-ano-topo"><b>'+ano+'</b><small>'+tot+(tot===1?' aniversariante':' aniversariantes')+' · '+ger+(ger===1?' arte gerada':' artes geradas')+'</small></div>'+meses.map(function(x){ var at=x[0]===num(function(){ return state.month; });
+      return '<button type="button" class="dx-ano-m'+(at?' agora':'')+'" data-m="'+x[0]+'"><span>'+MES_CURTO[x[0]-1]+'</span><i><i style="transform:scaleX('+(x[1]/max).toFixed(3)+')"></i><i class="g" style="transform:scaleX('+(x[2]/max).toFixed(3)+')"></i></i><em>'+x[1]+'</em></button>'; }).join('');
+    caixa.appendChild(c);
+    c.querySelectorAll('.dx-ano-m').forEach(function(b){ b.onclick=function(){ num(function(){ state.month=+b.dataset.m; W.setTab('aniv'); if(typeof W.renderMonths==='function') W.renderMonths(); if(typeof W.renderMonth==='function') W.renderMonth(); }); reagir('feliz',800); }; });
+    if(!parado()) [].forEach.call(c.querySelectorAll('.dx-ano-m i i'),function(b,i){ M.anima(b,[{transform:'scaleX(0)'},{transform:b.style.transform}],'suave',{delay:Math.floor(i/2)*35,fill:'backwards'}); });
+    rolar();
+  }
+  function lista(caixa,pessoas,vazio){
+    if(!pessoas.length){ caixa.appendChild(el('div','dx-nota-chat',vazio)); rolar(); return; }
+    var l=el('div','dx-lista-mes'); pessoas.slice(0,30).forEach(function(x){ var i=el('button','dx-lm-item','<span>'+esc(x[1])+'</span><b>'+esc(x[0].name)+'</b>'); i.type='button'; i.onclick=function(){ var r=falaBot('Ficha de <b>'+esc(x[0].name)+'</b>:'); cartaoPessoa(x[0],r); }; l.appendChild(i); });
+    caixa.appendChild(l); rolar();
+  }
+  function fotosRuins(caixa){ var r=[]; num(function(){ state.people.forEach(function(p){ var fs=state.photos[p.id]||[], notas=fs.map(function(f){ return f.analysis&&f.analysis.score||0; }); if(!fs.length) return; var m=Math.max.apply(null,notas); if(m&&m<55) r.push([p,m]); }); });
+    r.sort(function(a,b){ return a[1]-b[1]; }); lista(caixa,r,'Nenhuma foto com nota baixa. Todas as melhores fotos estão acima de 55!'); }
+  function foraDasListas(caixa){ var nas={}; todasEntradas().forEach(function(x){ if(x.e.personId) nas[x.e.personId]=1; }); var r=[]; num(function(){ state.people.forEach(function(p){ if(!nas[p.id]) r.push([p,'—']); }); });
+    lista(caixa,r,'Todo mundo do cadastro aparece em alguma lista de aniversariantes.'); }
+  function copiarLista(nomeMes,caixa){
+    var mi=nomeMes?MESES_RE.split('|').indexOf(normalizar(nomeMes))+1:num(function(){ return state.month; }), ano=num(function(){ return state.year; });
+    var rec=num(function(){ return state.months[mk(ano,mi)]; }), es=(rec&&rec.entries||[]).slice().sort(function(a,b){ return a.day-b.day; });
+    if(!es.length){ caixa.appendChild(el('div','dx-nota-chat','Não há lista em '+MESNOME[mi-1]+'.')); rolar(); return; }
+    var txt=es.map(function(e){ return String(e.day).padStart(2,'0')+'/'+String(e.month).padStart(2,'0')+' – '+e.name; }).join('\n');
+    var ok=function(){ caixa.appendChild(el('div','dx-nota-chat','Copiei '+es.length+' nomes de '+MESNOME[mi-1]+'. É só colar onde quiser.')); rolar(); reagir('feliz',900); };
+    try{ navigator.clipboard.writeText(txt).then(ok,function(){ var t=el('textarea','dx-copia'); t.value=txt; caixa.appendChild(t); t.select(); rolar(); }); }catch(e){ ok(); }
+  }
+  async function baixarArte(nome,caixa){
+    var r=buscarPessoas(nome), alvo=null;
+    r.lista.some(function(x){ var f=ficha(x.p); if(f.entrada){ alvo={f:f,p:x.p}; return true; } return false; });
+    if(!alvo){ caixa.appendChild(el('div','dx-nota-chat',r.lista.length?'Essa pessoa não está em nenhuma lista do mês, então não tem arte para baixar.':'Não encontrei essa pessoa.')); rolar(); return; }
+    var e=num(function(){ return state.months[alvo.f.lista].entries.find(function(x){ return x.id===alvo.f.entrada; }); });
+    if(!e||typeof W.generateEntry!=='function'){ caixa.appendChild(el('div','dx-nota-chat','Não consegui gerar essa arte agora.')); rolar(); return; }
+    var n=el('div','dx-nota-chat','Gerando a arte de '+esc(e.name)+'…'); caixa.appendChild(n); rolar(); reagir('pensando',2000);
+    try{ var blob=num(function(){ return state.blobs.get(e.id); })||await W.generateEntry(e);
+      if(!blob) throw 0; var a=D.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Aniversariante_'+String(e.day).padStart(2,'0')+'_'+MES_CURTO[e.month-1].toUpperCase()+'_-_'+e.name.replace(/[\\/:*?"<>|]/g,'-')+'.png'; D.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },4000);
+      n.textContent='Pronto! A arte de '+e.name+' foi baixada.'; reagir('comemorando',1400); }
+    catch(err){ n.textContent='Não deu para gerar: falta foto ou cadastro de '+e.name+'.'; reagir('triste',1200); }
+  }
+  function vestir(nome,caixa){
+    var k=normalizar(nome).trim(), i=-1; TEMAS.forEach(function(t,n){ if(i<0&&normalizar(t[0])===k) i=n; }); if(i<0) TEMAS.forEach(function(t,n){ if(i<0&&normalizar(t[0]).indexOf(k)===0) i=n; });
+    if(i<0){ caixa.appendChild(el('div','dx-nota-chat','Não conheço essa fantasia. Tenho: '+TEMAS.filter(function(t,n){ return temaLivre(n); }).map(function(t){ return t[0]; }).join(', ')+'.')); rolar(); return; }
+    if(!temaLivre(i)){ var x=EXTRAS.filter(function(e){ return e[0]===TEMAS[i][2]; })[0]; caixa.appendChild(el('div','dx-nota-chat','Essa ainda está bloqueada. Para liberar: '+x[3].toLowerCase()+'.')); rolar(); reagir('pensando',1200); return; }
+    var t=TEMAS[i][1]; CFG.cab=t.cab; CFG.rosto=t.rosto; CFG.corpo=t.corpo; salvar(); aplicarCfg(); trocarAvatares&&trocarAvatares(); truque('pirueta'); reagir('comemorando',1400);
+    caixa.appendChild(el('div','dx-nota-chat','Prontinho, agora estou de '+TEMAS[i][0]+'!')); rolar();
+  }
+  function conquistas(caixa){ var c=el('div','dx-conqs dx-conqs-chat',htmlConquistas()); caixa.appendChild(c); rolar(); }
+  var RE_F=[
+    [/^(ajuda|comandos|menu|funcoes|o que (voce|vc) (sabe|consegue|pode) fazer\??|o que (voce|vc) faz\??)$/,function(){ ajuda(); }],
+    [/\b(piada|me faz rir|algo engracado)\b/,function(){ falaBot(esc(PIADAS[Math.floor(Math.random()*PIADAS.length)])); reagir('comemorando',1400); }],
+    [/\b(danca|faz um truque|faca um truque|pirueta|da um pulo|faz uma graca)\b/,function(){ falaBot(CFG.jeito==='formal'?'Certo.':'Olha só!'); truque(Math.random()<.5?'pirueta':'pula'); reagir('comemorando',1600); }],
+    [/(bip.?bop)/,function(){ var b=falaBot('Bip-bop! Você descobriu meu bordão.'); reagir('amor',1400); setTimeout(function(){ conquistar('cowboy'); },700); }],
+    [/\b(conquistas?|desbloque\w*|fantasias? bloqueadas?)\b/,function(){ var b=falaBot('Suas conquistas e as fantasias que ainda faltam:'); conquistas(b); }],
+    [/^(vestir|veste|usar a fantasia|usa a fantasia|coloca a fantasia|fantasia de)\s+(.+)$/,function(m){ var b=falaBot(''); b.querySelector('.dex-txt').remove(); vestir(m[2],b); },true],
+    [/\bproxim[oa]s? aniversariantes?\b|\bquem e o proximo\b|\bproximo a fazer aniversario\b|\bproximo aniversario\b/,function(){ var b=falaBot('O próximo aniversário é de:'); proximoAniv(b); reagir('feliz',900); }],
+    [/\b(resumo|relatorio|panorama|visao geral) do ano\b|\bano (todo|inteiro)\b|\btodos os meses\b/,function(){ var b=falaBot('O ano mês a mês (toque num mês para abrir):'); resumoAno(b); reagir('feliz',900); }],
+    [/\b(nota baixa|fotos? ruins?|fotos? fracas?|qualidade das fotos|fotos? piores)\b/,function(){ var b=falaBot('Melhores fotos com nota baixa (vale trocar por uma melhor):'); fotosRuins(b); }],
+    [/\b(fora das listas|sem aniversario|nao (esta|estao) em nenhuma lista|sem data)\b/,function(){ var b=falaBot('Cadastrados que não aparecem em nenhuma lista:'); foraDasListas(b); }],
+    [/\bcopi(ar|a|e)\b.*\blista\b(?:.*\b(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b)?/,function(m){ var b=falaBot('Copiando a lista…'); copiarLista(m[2],b); }],
+    [/\b(baixar|baixa|salvar|salva|download)\b (?:a |o )?(?:arte|png|imagem) d[aeo]s? (.+)$/,function(m){ var b=falaBot(''); b.querySelector('.dex-txt').remove(); baixarArte(m[2],b); }]];
+  function funcoesExtras(t){
+    var n=normalizar(t).replace(/[?!.]+$/,'').trim();
+    for(var i=0;i<RE_F.length;i++){ var m=n.match(RE_F[i][0]); if(m){ falaUser(t); RE_F[i][1](m); return true; } }
+    return false;
   }
 
   /* =================================================================== 11. CONVERSA COM A IA */
@@ -977,6 +1174,12 @@
         case 'pessoa': if(arg&&caixa){ var rp=buscarPessoas(arg); if(rp.lista.length===1) cartaoPessoa(rp.lista[0].p,caixa); else if(rp.lista.length>1) escolherPessoa(rp.lista,caixa); } break;
         case 'abrir_cadastro': if(arg){ var rc=buscarPessoas(arg); if(rc.lista.length===1&&rc.lista[0].p.id&&typeof W.personDialog==='function'){ var pc=rc.lista[0].p; botoes.push({t:'Abrir o cadastro de '+pc.name.split(' ')[0],fn:function(){ num(function(){ W.setTab('colab'); }); setTimeout(function(){ W.personDialog(pc.id); },250); }}); } } break;
         case 'lista_mes': if(arg){ responderLocalMes(arg,caixa); } break;
+        case 'relatorio_ano': if(caixa) resumoAno(caixa); break;           case 'fotos_ruins': if(caixa) fotosRuins(caixa); break;
+        case 'fora_listas': if(caixa) foraDasListas(caixa); break;         case 'proximo': if(caixa) proximoAniv(caixa); break;
+        case 'conquistas': if(caixa) conquistas(caixa); break;            case 'copiar_lista': if(caixa) copiarLista(arg||'',caixa); break;
+        case 'baixar_arte': if(arg) botoes.push({t:'Baixar a arte de '+arg,fn:function(){ baixarArte(arg,caixa); }}); break;
+        case 'vestir': if(arg&&caixa) vestir(arg,caixa); break;
+        case 'truque': truque('pirueta'); break;
         case 'gerar_mes': rodarComando('gerar o mês de '+(arg||num(function(){ return MESNOME[state.month-1]; })||'')); break;
         case 'gerar_arte': if(arg) botoes.push({t:'Gerar a arte de '+arg,fn:function(){ rodarComando('gerar arte da '+arg); }}); break;
         case 'editar_dex': botoes.push({t:'Abrir o Estúdio do Dex',fn:abrirEstudio}); break;
@@ -1022,7 +1225,7 @@
       var motivo=!r?'rede':((j&&j.erro)==='limite'||r.status===429)?'limite':(j&&j.erro)==='sem_chave'?'sem_chave':'rede';
       if(motivo==='sem_chave') localAte=Infinity; paraLocal(texto,motivo); return;
     }
-    usoDia(); USO.perguntas=(USO.perguntas||0)+1; var uso=j.uso||{};
+    usoDia(); USO.perguntas=(USO.perguntas||0)+1; contar('conversas',10,'mago'); var uso=j.uso||{};
     USO.entrada=(USO.entrada||0)+(uso.entrada||0); USO.saida=(USO.saida||0)+(uso.saida||0); USO.ms=(USO.ms||0)+(j.ms||0);
     USO.hist=(USO.hist||[]).concat([uso.total||0]).slice(-30);
     USO.ultimo={modelo:j.modelo,provedor:j.provedor,ms:j.ms,limites:j.limites||{},quando:Date.now()}; salvarUso();
@@ -1056,8 +1259,9 @@
     if(ev.target!==form||passar||comando||ocupado) return;
     var t=(input.value||'').trim(); if(!t||t.charAt(0)==='/') return;
     if(!num(function(){ return state&&state.people; })) return;
+    var h=new Date().getHours(); if(h>=22||h<5) setTimeout(function(){ conquistar('astronauta'); },1500);
     var ok=false; try{ ok=responderLocal(t); }catch(e){ ok=false; }
-    if(!ok) return;
+    if(!ok) return; contar('conversas',10,'mago');
     viuDex=true; ev.preventDefault(); ev.stopImmediatePropagation(); input.value=''; form.classList.remove('tem-texto');
     usoDia(); USO.locais=(USO.locais||0)+1; salvarUso();
     hist.push({role:'user',content:t},{role:'assistant',content:'(mostrei no chat a ficha ou a lista pedida)'}); if(hist.length>12) hist=hist.slice(-12);

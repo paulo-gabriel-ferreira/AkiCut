@@ -76,9 +76,12 @@ CONSUMO DA IA
 CARREGAMENTOS
   Ficam no meio da tela, com o Dex trabalhando de verdade (cada gesto é decidido na hora,
   sem animação repetida) e a porcentagem real:
-    Gerar artes ........ ele pinta um quadro, de boina e bigode, e molha o pincel na paleta
-    Montar o ZIP ....... ele pega papéis da pilha, joga ou leva até o envelope amarelo e fecha
-    Abrir uma foto/arte  ele sacode uma foto instantânea enquanto ela revela
+    Gerar artes ........ ele pinta um quadro de verdade, em etapas que seguem a porcentagem:
+                         esboço a lápis, céu, sol, montanhas e campo com pincel largo (com
+                         respingos), detalhes com pincel fino, assinatura, brilho e moldura
+    Montar o ZIP ....... pega papéis da pilha, joga (o papel gira no ar) ou leva até o envelope,
+                         o envelope conta as artes, ele fecha, carimba e o envelope sai voando
+    Abrir uma foto/arte  tira a foto, a câmera solta a foto instantânea, ele pega, sacode e revela
     Outros ............. ele escreve e confere um relatório
 
 BUSCAR PESSOAS
@@ -92,9 +95,22 @@ NOME AKICUT
   chaves salvas no navegador continuam com o nome antigo de propósito: assim nenhum dado se perde.
   Não renomeie o bucket.
 
+FANTASIAS PARA DESBLOQUEAR
+  Ninja (tour completo) · Lutador (cutucar o Dex 15 vezes) · Samurai (gerar as artes de um mês)
+  Pirata (baixar um ZIP) · Mago (10 conversas) · Astronauta (usar depois das 22h)
+  Herói (abrir o AkiCut em 3 dias diferentes) · Cowboy (segredo: a palavra que o Dex mais fala)
+  O progresso fica no Estúdio → Fantasias → Conquistas, ou digite "conquistas" no chat.
+  Pelo chat: "vestir pirata". O progresso fica salvo no navegador de cada pessoa.
+
+MAIS FUNÇÕES DO DEX (digite "ajuda" no chat)
+  próximo aniversariante · resumo do ano (gráfico mês a mês) · fotos com nota baixa
+  quem está fora das listas · copiar a lista de março · baixar a arte da Ana (gera e baixa o PNG)
+  conquistas · vestir <fantasia> · conta uma piada · faz um truque
+
 GUIA NA TELA
   Pergunte "onde fica importar lista?" e o Dex voa até o botão e aponta com o braço.
   Digite /tour para um tour completo: use as setas da barrinha (ou do teclado) e Esc para sair.
+  O Dex voa de verdade entre os botões: arranca devagar, faz um arco, inclina e pousa suave.
 
 ENSINAR ALGO NOVO AO DEX
   Em api/_dex-conhecimento.js, adicione um item na lista TRECHOS:

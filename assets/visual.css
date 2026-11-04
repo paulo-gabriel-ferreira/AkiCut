@@ -104,3 +104,4 @@ html:not(#ak) .panel-h h2::before,html:not(#ak) .panel-h h3::before,html:not(#ak
 html:not(#ak) .mchip.on,html:not(#ak) .mchip[aria-pressed="true"],html:not(#ak) .mchip.active{background:var(--pro-cta) !important;color:var(--pro-cta-txt) !important;border-color:var(--pro-cta) !important;box-shadow:none !important}
 html:not(#ak) .ico-chap::before{display:none !important}
 html:not(#ak) ::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+html:not(#ak) dialog::backdrop{background:rgba(8,10,14,.55) !important}

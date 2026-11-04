@@ -15,7 +15,7 @@ const MODELOS_OR = (process.env.DEX_MODELOS_OR || 'thinkingmachines/inkling-smal
 
 const ACOES = new Set(['tour', 'aba', 'resumo', 'pendencias', 'hoje', 'semana', 'mes30', 'espaco', 'confirmar', 'buscar', 'arte', 'gerar_mes', 'gerar_arte', 'ir_mes',
   'importar_lista', 'importar_fotos', 'unificar', 'sem_foto', 'ajustar', 'chapeleiro', 'zip', 'preparar', 'configuracoes', 'tema', 'editar_dex',
-  'pessoa', 'abrir_cadastro', 'lista_mes']);
+  'pessoa', 'abrir_cadastro', 'lista_mes', 'relatorio_ano', 'fotos_ruins', 'fora_listas', 'proximo', 'conquistas', 'copiar_lista', 'baixar_arte', 'vestir', 'truque']);
 
 /* limite simples por visitante, para proteger a cota gratuita */
 const visitas = new Map();
@@ -67,6 +67,9 @@ Você pode pedir ao site para fazer algo colocando, no FIM da resposta, uma ou m
 [[acao:tour]] faz um tour guiado pelo site (você voa pela tela apontando as partes principais)
 [[acao:pessoa:NOME COMPLETO]] mostra a ficha da pessoa no chat (foto, aniversário, fotos, status da arte) · [[acao:abrir_cadastro:NOME]] botão para abrir o cadastro
 [[acao:lista_mes:MES]] mostra no chat a lista de aniversariantes de um mês (ex.: março)
+[[acao:proximo]] ficha do próximo aniversariante · [[acao:relatorio_ano]] o ano mês a mês · [[acao:fotos_ruins]] quem tem foto com nota baixa · [[acao:fora_listas]] cadastrados fora das listas
+[[acao:copiar_lista:MES]] copia a lista do mês · [[acao:baixar_arte:NOME]] botão para baixar o PNG de alguém · [[acao:conquistas]] mostra as conquistas e fantasias
+[[acao:vestir:FANTASIA]] troca a sua fantasia (Clássico, Natal, Páscoa, Formatura, Festa, Chef, DJ, Realeza, Ninja, Lutador, Samurai, Pirata, Mago, Astronauta, Herói, Cowboy) · [[acao:truque]] você dá uma pirueta
 Use uma ação só quando o usuário pedir para fazer ou ver algo. Nunca diga que já fez algo: diga "vou abrir", "aqui está" ou "clique no botão abaixo".
 
 MOSTRAR NA TELA
@@ -84,6 +87,8 @@ REGRAS
 - Use os números da situação atual quando ajudarem.
 - PESSOAS: quando a pergunta cita alguém, a situação atual traz "pessoas_encontradas" com as fichas reais (nome, aniversário, faltam_dias, fotos, melhor_nota, status da arte, aviso). Responda com esses dados, de forma direta, e termine com [[acao:pessoa:NOME COMPLETO]] para mostrar a ficha. Se vier mais de uma pessoa, diga quais encontrou e pergunte qual é. Se vier "busca_sem_resultado", diga que não encontrou ninguém com esse nome e, se houver "nomes_parecidos", sugira-os. Nunca invente pessoas, datas ou números que não estejam nos dados.
 - "aniversariantes_do_mes_aberto" (quando vier) lista dia e nome do mês aberto: use para perguntas sobre quem faz aniversário.
+- FANTASIAS: algumas fantasias se desbloqueiam com conquistas (tour completo, cutucar o Dex, gerar um mês, baixar um ZIP, conversar, usar à noite, voltar em dias diferentes e um segredo). Nunca revele o segredo; diga só que é a palavra que você mais fala.
+- Se o usuário pedir fantasias de personagens de outras obras (animes, filmes, jogos), diga com gentileza que você só veste fantasias originais e sugira uma parecida, como Ninja, Lutador ou Samurai.
 - Se perguntarem quanto você consome, seu estado ou seus limites, diga que o painel aparece tocando no seu nome no topo do chat, ou digitando /status.`;
 }
 

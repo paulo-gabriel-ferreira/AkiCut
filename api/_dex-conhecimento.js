@@ -731,6 +731,14 @@ const TRECHOS = [
  {
   "k": ["quem e", "ficha", "informacoes", "aniversario de", "dados do", "dados da", "colaborador", "procurar pessoa"],
   "t": "O Dex acha colaboradores pelo nome, mesmo sem acento, só com o primeiro nome ou com grafia parecida (Souza e Sousa, Luis e Luiz). Perguntas como 'quem é a Ana Souza?', 'aniversário do Bruno' ou 'fotos da Carla' mostram a ficha no chat: aniversário e quantos dias faltam, quantas fotos e a melhor nota, e o status da arte do mês, com botões para abrir o cadastro ou a arte. 'Aniversariantes de março' mostra a lista do mês. Isso é respondido pelo próprio site, sem gastar IA."
+ },
+ {
+  "k": ["fantasia", "desbloquear", "conquista", "skin", "roupa", "ninja", "samurai", "pirata", "mago", "astronauta", "cowboy", "heroi", "lutador"],
+  "t": "Além das fantasias livres (Clássico, Natal, Páscoa, Formatura, Festa, Chef, DJ, Realeza), o Dex tem fantasias que se desbloqueiam: Ninja (fazer o tour completo), Lutador (cutucar o Dex 15 vezes), Samurai (gerar as artes de um mês), Pirata (baixar um ZIP), Mago (conversar 10 vezes), Astronauta (usar o Dex depois das 22h), Herói (abrir o AkiCut em 3 dias diferentes) e Cowboy (um segredo no chat). O progresso aparece no Estúdio do Dex, aba Fantasias, em Conquistas, ou digitando 'conquistas' no chat. Para trocar pelo chat: 'vestir ninja'."
+ },
+ {
+  "k": ["o que voce faz", "comandos", "ajuda", "funcoes", "baixar a arte", "copiar lista", "resumo do ano", "nota baixa", "proximo aniversariante"],
+  "t": "No chat, o Dex responde sem gastar IA: 'ajuda' mostra tudo; 'quem é Fulano' mostra a ficha; 'próximo aniversariante'; 'resumo do ano' com o gráfico mês a mês; 'fotos com nota baixa'; 'quem está fora das listas'; 'copiar a lista de março'; 'baixar a arte da Ana' gera e baixa o PNG; 'conquistas'; 'vestir pirata'; 'conta uma piada'; 'faz um truque'; além de resumo do mês, pendências, hoje, próximos 7 dias, espaço, /tour e /status."
  }
 ];
 

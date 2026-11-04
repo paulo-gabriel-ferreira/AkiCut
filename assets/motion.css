@@ -40,6 +40,33 @@ body.hud-icons .top .brand .nm b.brand-cut,body.hud-icons .top #brandsub{display
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent !important}
 #splash .sp-cut i,#splash .sp-cut i:nth-child(2){color:#fff !important}
 
+/* tesoura da marca: proporção sempre quadrada (nunca achata) e um "corte" suave */
+.ak-tesoura{display:block;flex:none;aspect-ratio:1/1;height:auto;overflow:visible}
+.ak-tesoura .ak-lamina-a,.ak-tesoura .ak-lamina-b{transform-box:view-box;transform-origin:32px 33.4px}
+.top .brand{position:relative}
+.top .brand{display:grid !important;grid-template-columns:auto 1fr;column-gap:12px;align-items:start}
+.top .brand .ak-tesoura{width:62px;margin:2px 0 0 0;grid-row:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
+.top .brand .nm{grid-column:2;min-width:0}
+.top .brand .nm b.brand-aki{font-size:60px !important}
+.top .brand .nm b.brand-cut{font-size:27px !important;letter-spacing:.36em !important}
+/* em fundo escuro o contorno fica claro, como um adesivo (no claro ele é escuro, como no ícone da aba) */
+.top .ak-tesoura .c,.akc-marca .ak-tesoura .c{stroke:#ECEEF1}
+.top .brand:hover .ak-lamina-a{animation:akCorteA .7s cubic-bezier(.3,.7,.3,1)}
+.top .brand:hover .ak-lamina-b{animation:akCorteB .7s cubic-bezier(.3,.7,.3,1)}
+@keyframes akCorteA{0%,100%{transform:none}35%{transform:rotate(-13deg)}70%{transform:rotate(3deg)}}
+@keyframes akCorteB{0%,100%{transform:none}35%{transform:rotate(13deg)}70%{transform:rotate(-3deg)}}
+/* na tela de carregamento a tesoura abre e corta, sem parar */
+.akc-marca .ak-tesoura{width:72px;height:72px}
+.ak-tesoura-carga .ak-lamina-a{animation:akCorteA 1.15s cubic-bezier(.45,0,.3,1) infinite}
+.ak-tesoura-carga .ak-lamina-b{animation:akCorteB 1.15s cubic-bezier(.45,0,.3,1) infinite}
+body.hud-top .top .brand,body.hud-bottom .top .brand{display:flex !important;align-items:center}
+body.hud-top .top .brand .ak-tesoura,body.hud-bottom .top .brand .ak-tesoura{width:38px;margin:0 10px 0 0}
+body.hud-icons .top .brand{display:block !important}
+body.hud-icons .top .brand .ak-tesoura{width:42px;margin:0 auto 6px}
+body.hud-icons .top .brand .nm b.brand-aki{display:none !important}
+@media (max-width:900px){.top .brand .ak-tesoura{width:36px;margin:0 8px 0 0}.top .brand{display:flex !important;align-items:center}}
+@media (prefers-reduced-motion:reduce){.ak-tesoura *{animation:none !important}}
+
 /* ---------- 2. Desempenho ---------- */
 /* animações escondidas não rodam */
 #busy:not(.on),#busy:not(.on) *{animation-play-state:paused !important}

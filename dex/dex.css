@@ -608,8 +608,12 @@ html[data-ak-mov="suaves"] .dex-flut,html[data-ak-mov="suaves"] .dex-sombra,html
 
 /* ============ 12. NUVEM DE POEIRA (Ctrl + M) ============ */
 .dx-poeira{position:fixed;width:0;height:0;z-index:2147483200;pointer-events:none}
-.dx-poeira-b{position:absolute;left:0;top:0;border-radius:50%;opacity:0;will-change:transform,opacity;
-  background:radial-gradient(circle at 38% 35%,#fff 0%,#E4E7EC 38%,rgba(196,201,209,.85) 62%,rgba(196,201,209,0) 72%)}
-html[data-theme="dark"] .dx-poeira-b{background:radial-gradient(circle at 38% 35%,#F2F3F5 0%,#C9CED6 40%,rgba(140,146,156,.8) 62%,rgba(140,146,156,0) 72%)}
-.dx-poeira-s{position:absolute;left:-4px;top:-4px;width:8px;height:8px;opacity:0;background:#fff;
+.dx-poeira i{position:absolute;left:0;top:0;opacity:0;will-change:transform,opacity}
+.dx-poeira-b{border-radius:50%;background:radial-gradient(circle at 36% 32%,#FFFFFF 0%,#E9EBEF 30%,#B6BCC5 64%,rgba(150,157,168,0) 71%)}
+.dx-poeira-b.grande{background:radial-gradient(circle at 38% 34%,#FFFFFF 0%,#EEF0F3 34%,#C2C7CF 62%,rgba(160,166,177,0) 71%)}
+.dx-poeira-b.fiapo{background:radial-gradient(circle,rgba(230,232,236,.9) 0%,rgba(200,205,212,.5) 50%,rgba(200,205,212,0) 70%)}
+html[data-theme="dark"] .dx-poeira-b{background:radial-gradient(circle at 36% 32%,#F4F5F7 0%,#C9CED6 36%,#8A9099 64%,rgba(110,116,126,0) 71%)}
+.dx-poeira-onda{border-radius:50%;border:2px solid rgba(200,205,212,.7)}
+html[data-theme="dark"] .dx-poeira-onda{border-color:rgba(236,238,241,.5)}
+.dx-poeira-s{left:-4px !important;top:-4px !important;width:8px;height:8px;background:#fff;filter:drop-shadow(0 0 2px rgba(0,0,0,.25));
   clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}

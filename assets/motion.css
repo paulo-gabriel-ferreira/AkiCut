@@ -49,8 +49,8 @@ body.hud-icons .top .brand .nm b.brand-cut,body.hud-icons .top #brandsub{display
 .top .brand .nm{grid-column:2;min-width:0}
 .top .brand .nm b.brand-aki{font-size:60px !important}
 .top .brand .nm b.brand-cut{font-size:27px !important;letter-spacing:.36em !important}
-/* em fundo escuro o contorno fica claro, como um adesivo (no claro ele é escuro, como no ícone da aba) */
-.top .ak-tesoura .c,.akc-marca .ak-tesoura .c{stroke:#ECEEF1}
+/* contorno sempre preto, em todos os temas (igual ao ícone da aba) */
+.ak-tesoura .c{stroke:#000}
 .top .brand:hover .ak-lamina-a{animation:akCorteA .7s cubic-bezier(.3,.7,.3,1)}
 .top .brand:hover .ak-lamina-b{animation:akCorteB .7s cubic-bezier(.3,.7,.3,1)}
 @keyframes akCorteA{0%,100%{transform:none}35%{transform:rotate(-13deg)}70%{transform:rotate(3deg)}}

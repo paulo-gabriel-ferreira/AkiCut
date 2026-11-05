@@ -1280,42 +1280,58 @@
   },true);
 
   /* =================================================================== 11d. CTRL + M: SOME E APARECE NUMA NUVEM DE POEIRA */
-  function nuvem(x,y,k){
+  /* a nuvem estoura na hora (sem espera): miolo denso, anel que se espalha, fiapos que sobem e uma onda de ar */
+  function nuvem(x,y,k,modo){
     var box=el('div','dx-poeira'); box.style.left=x+'px'; box.style.top=y+'px'; D.body.appendChild(box);
-    var leve=M.leve&&M.leve(), n=leve?7:11, fim=0;
-    for(var i=0;i<n;i++){
-      var b=el('i','dx-poeira-b'), r=(16+Math.random()*16)*k, a=Math.PI*2*i/n+Math.random()*.5, d=(26+Math.random()*30)*k;
-      b.style.width=b.style.height=r*2+'px'; b.style.marginLeft=b.style.marginTop=-r+'px'; box.appendChild(b);
-      var dur=560+Math.random()*320; fim=Math.max(fim,dur);
-      b.animate([{transform:'translate(0,0) scale(.25)',opacity:.95},{transform:'translate('+(Math.cos(a)*d*.55)+'px,'+(Math.sin(a)*d*.4-6*k)+'px) scale(1)',opacity:.85,offset:.35},
-        {transform:'translate('+(Math.cos(a)*d)+'px,'+(Math.sin(a)*d*.75-18*k)+'px) scale(1.35)',opacity:0}],{duration:dur,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'});
+    var leve=M.leve&&M.leve(), fim=0, E1='cubic-bezier(.12,.8,.25,1)';
+    function puff(r,dx,dy,dur,atraso,cls,cresce){
+      var b=el('i','dx-poeira-b'+(cls?' '+cls:'')); b.style.width=b.style.height=(r*2)+'px'; b.style.marginLeft=b.style.marginTop=(-r)+'px'; box.appendChild(b);
+      b.animate([{transform:'translate(0,0) scale(.2)',opacity:0},{transform:'translate('+(dx*.55)+'px,'+(dy*.55)+'px) scale(1)',opacity:1,offset:.22},
+        {transform:'translate('+dx+'px,'+(dy-14*k)+'px) scale('+(cresce||1.5)+')',opacity:0}],{duration:dur,delay:atraso,easing:E1,fill:'both'});
+      fim=Math.max(fim,dur+atraso);
     }
-    for(var j=0;j<5;j++){ var s2=el('i','dx-poeira-s'), a2=Math.random()*Math.PI*2, d2=(40+Math.random()*30)*k; box.appendChild(s2);
-      s2.animate([{transform:'translate(0,0) scale(0) rotate(0)',opacity:1},{transform:'translate('+(Math.cos(a2)*d2)+'px,'+(Math.sin(a2)*d2-20)+'px) scale(1) rotate(90deg)',opacity:1,offset:.5},
-        {transform:'translate('+(Math.cos(a2)*d2*1.2)+'px,'+(Math.sin(a2)*d2*1.2-30)+'px) scale(0) rotate(180deg)',opacity:0}],{duration:700,easing:'ease-out',fill:'forwards'}); }
-    setTimeout(function(){ box.remove(); },fim+120);
+    /* onda de ar */
+    var onda=el('i','dx-poeira-onda'); onda.style.width=onda.style.height=(90*k)+'px'; onda.style.marginLeft=onda.style.marginTop=(-45*k)+'px'; box.appendChild(onda);
+    onda.animate([{transform:'scale(.2)',opacity:.7},{transform:'scale(1.25)',opacity:0}],{duration:380,easing:'cubic-bezier(.1,.7,.3,1)',fill:'both'});
+    /* miolo */
+    for(var i=0;i<(leve?3:4);i++){ var a=Math.random()*Math.PI*2; puff((22+Math.random()*8)*k,Math.cos(a)*8*k,Math.sin(a)*6*k-4*k,520+Math.random()*160,0,'grande',1.35); }
+    /* anel */
+    var n=leve?7:10; for(var j=0;j<n;j++){ var a2=Math.PI*2*j/n+Math.random()*.4, d=(40+Math.random()*16)*k; puff((10+Math.random()*7)*k,Math.cos(a2)*d,Math.sin(a2)*d*.62,460+Math.random()*200,20+Math.random()*40,'',1.6); }
+    /* fiapos que sobem devagar */
+    if(!leve) for(var w=0;w<3;w++) puff((8+Math.random()*5)*k,(Math.random()-.5)*30*k,-(46+Math.random()*24)*k,820+Math.random()*200,90,'fiapo',1.8);
+    /* brilhos */
+    for(var q=0;q<(leve?3:6);q++){ var s2=el('i','dx-poeira-s'), a3=Math.random()*Math.PI*2, d3=(46+Math.random()*26)*k; box.appendChild(s2);
+      s2.animate([{transform:'translate(0,0) scale(0) rotate(0)',opacity:1},{transform:'translate('+(Math.cos(a3)*d3*.7)+'px,'+(Math.sin(a3)*d3*.7-10)+'px) scale(1.1) rotate(90deg)',opacity:1,offset:.45},
+        {transform:'translate('+(Math.cos(a3)*d3)+'px,'+(Math.sin(a3)*d3-22)+'px) scale(0) rotate(200deg)',opacity:0}],{duration:560,delay:40,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}); }
+    setTimeout(function(){ box.remove(); },fim+80);
   }
-  var trocandoVis=false;
+  var animVis=null, indoVis=null;
+  function centroDex(){ var r=btn.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height*.52,k:Math.max(.8,r.width/96)}; }
   function alternarDex(){
-    if(trocandoVis) return; trocandoVis=true;
-    var some=H.getAttribute('data-ak-orb')!=='nao';
+    /* se apertar no meio da animação, inverte na hora a partir de onde está */
+    var some=H.getAttribute('data-ak-orb')!=='nao'&&indoVis!=='some';
+    if(animVis){ animVis.cancel(); animVis=null; } indoVis=some?'some':'aparece';
     if(some){
       if(E.guia) fimGuia();
-      var r=btn.getBoundingClientRect(), k=Math.max(.8,r.width/96);
-      nuvem(r.left+r.width/2,r.top+r.height*.55,k);
-      var a=btn.animate([{transform:'none',opacity:1},{transform:'scale(1.12,.9)',opacity:1,offset:.3},{transform:'scale(.15) translateY(20%)',opacity:0}],{duration:parado()?1:300,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'});
-      a.finished.then(function(){ definir('__orb','nao'); a.cancel(); trocandoVis=false; if(est&&est.open) marcarEstudio(false); },function(){ trocandoVis=false; });
+      var c=centroDex(); nuvem(c.x,c.y,c.k,'some'); reagir('surpresa',400); balao.classList.remove('on');
+      /* encolhe girando para dentro da fumaça: rápido, sem esperar a nuvem */
+      animVis=btn.animate([{transform:'none',opacity:1},{transform:'scale(1.1,.86) translateY(4%)',opacity:1,offset:.22},
+        {transform:'scale(.55) rotate(-28deg) translateY(-10%)',opacity:.9,offset:.6},{transform:'scale(0) rotate(-70deg) translateY(-18%)',opacity:0}],
+        {duration:parado()?1:250,easing:'cubic-bezier(.45,0,.6,1)',fill:'forwards'});
+      var a=animVis; a.finished.then(function(){ if(animVis!==a) return; definir('__orb','nao'); a.cancel(); animVis=null; indoVis=null; if(est&&est.open) marcarEstudio(false); },function(){});
     } else {
       definir('__orb','sim'); cacheRect();
-      var r2=btn.getBoundingClientRect(), k2=Math.max(.8,r2.width/96);
-      nuvem(r2.left+r2.width/2,r2.top+r2.height*.55,k2);
-      var b=btn.animate([{transform:'scale(0)',opacity:0},{transform:'scale(0)',opacity:0,offset:.25},{transform:'scale(1.18,.86)',opacity:1,offset:.6},{transform:'scale(.95,1.06)',offset:.8},{transform:'none',opacity:1}],{duration:parado()?1:620,easing:'cubic-bezier(.3,.7,.3,1)'});
-      b.finished.then(function(){ trocandoVis=false; },function(){ trocandoVis=false; });
-      setTimeout(function(){ reagir('feliz',1200); },420);
+      var c2=centroDex(); nuvem(c2.x,c2.y,c2.k,'aparece');
+      /* sai da fumaça com um pulinho e assenta com mola */
+      animVis=btn.animate([{transform:'scale(0) rotate(40deg) translateY(10%)',opacity:0},{transform:'scale(1.16,.9) rotate(-6deg) translateY(-14%)',opacity:1,offset:.42},
+        {transform:'scale(.94,1.06) rotate(2deg) translateY(2%)',offset:.7},{transform:'scale(1.02,.98) translateY(0)',offset:.86},{transform:'none',opacity:1}],
+        {duration:parado()?1:430,easing:'cubic-bezier(.25,.75,.35,1)'});
+      var b=animVis; b.finished.then(function(){ if(animVis===b){ animVis=null; indoVis=null; } },function(){});
+      reagir('feliz',1200);
       if(est&&est.open) marcarEstudio(false);
     }
   }
-  W.addEventListener('keydown',function(e){ if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&(e.key==='m'||e.key==='M'||e.code==='KeyM')){ e.preventDefault(); alternarDex(); } },true);
+  W.addEventListener('keydown',function(e){ if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&(e.key==='m'||e.key==='M'||e.code==='KeyM')){ e.preventDefault(); alternarDex(); } },true);
   W.__dexAlternar=alternarDex;
 
   /* =================================================================== 12. INÍCIO */

@@ -8,13 +8,14 @@ O QUE TEM NESTA PASTA
   assets/temas.js             os temas do site (Ajustes → Tema do site)
   assets/visual.css           o visual profissional (grafite e cinzas; as cores da Akiyama ficam só no "Aki")
   dex/dex.css                 o visual do Dex, do chat, do painel de consumo e do Estúdio
-  dex/dex.js                  o Dex: personagem, chat, guia na tela, tour e Estúdio
+  dex/dex-robo.js             o Dex: personagem, chat, guia na tela, tour e Estúdio
   dex/dex-cargas.js           as telas de carregamento do Dex (pintor, envelope do ZIP, foto e relatório)
   api/dex.js                  a função que conversa com a IA (roda no Vercel, a chave fica escondida)
   api/_dex-conhecimento.js    tudo o que o Dex sabe sobre o site
 
 Mantenha as pastas assets, dex e api juntas, nesta estrutura, na raiz do projeto do Vercel.
-O dex.js antigo que ficava solto ao lado do index.html pode ser apagado.
+Não pode existir nenhum arquivo dex.js solto ao lado do index.html, nem "dex (1).js" ou parecido:
+apague esses no GitHub antes de subir. Cada arquivo tem um nome único e precisa ficar na sua pasta.
 
 
 PASSO 1 · Colocar a chave da IA no Vercel (só uma vez)

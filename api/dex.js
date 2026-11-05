@@ -15,7 +15,7 @@ const MODELOS_OR = (process.env.DEX_MODELOS_OR || 'thinkingmachines/inkling-smal
 
 const ACOES = new Set(['tour', 'aba', 'resumo', 'pendencias', 'hoje', 'semana', 'mes30', 'espaco', 'confirmar', 'buscar', 'arte', 'gerar_mes', 'gerar_arte', 'ir_mes',
   'importar_lista', 'importar_fotos', 'unificar', 'sem_foto', 'ajustar', 'chapeleiro', 'zip', 'preparar', 'configuracoes', 'tema', 'editar_dex',
-  'pessoa', 'abrir_cadastro', 'lista_mes', 'relatorio_ano', 'fotos_ruins', 'fora_listas', 'proximo', 'conquistas', 'copiar_lista', 'baixar_arte', 'vestir', 'truque']);
+  'pessoa', 'abrir_cadastro', 'lista_mes', 'relatorio_ano', 'fotos_ruins', 'fora_listas', 'proximo', 'conquistas', 'copiar_lista', 'baixar_arte', 'vestir', 'truque', 'tema_site']);
 
 /* limite simples por visitante, para proteger a cota gratuita */
 const visitas = new Map();
@@ -70,6 +70,7 @@ Você pode pedir ao site para fazer algo colocando, no FIM da resposta, uma ou m
 [[acao:proximo]] ficha do próximo aniversariante · [[acao:relatorio_ano]] o ano mês a mês · [[acao:fotos_ruins]] quem tem foto com nota baixa · [[acao:fora_listas]] cadastrados fora das listas
 [[acao:copiar_lista:MES]] copia a lista do mês · [[acao:baixar_arte:NOME]] botão para baixar o PNG de alguém · [[acao:conquistas]] mostra as conquistas e fantasias
 [[acao:vestir:FANTASIA]] troca a sua fantasia (Clássico, Natal, Páscoa, Formatura, Festa, Chef, DJ, Realeza, Ninja, Lutador, Samurai, Pirata, Mago, Astronauta, Herói, Cowboy) · [[acao:truque]] você dá uma pirueta
+[[acao:tema_site:NOME]] troca o tema do site (Padrão, Meia-noite, Akiyama, Oceano, Floresta, Vinho, Areia, Lavanda, Menta, Céu). Ctrl + M faz você sumir e aparecer numa nuvem de poeira.
 Use uma ação só quando o usuário pedir para fazer ou ver algo. Nunca diga que já fez algo: diga "vou abrir", "aqui está" ou "clique no botão abaixo".
 
 MOSTRAR NA TELA

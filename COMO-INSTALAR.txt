@@ -5,6 +5,7 @@ O QUE TEM NESTA PASTA
   index.html                  o site
   assets/motion.css           logo AkiCut, desempenho e modo leve
   assets/motion.js            o movimento do site (molas estilo Apple) usado também pelo Dex
+  assets/temas.js             os temas do site (Ajustes → Tema do site)
   assets/visual.css           o visual profissional (grafite e cinzas; as cores da Akiyama ficam só no "Aki")
   dex/dex.css                 o visual do Dex, do chat, do painel de consumo e do Estúdio
   dex/dex.js                  o Dex: personagem, chat, guia na tela, tour e Estúdio
@@ -94,6 +95,13 @@ NOME AKICUT
   Tudo que aparece na tela agora diz AkiCut. Por dentro, o bucket do Supabase ('anivercut') e as
   chaves salvas no navegador continuam com o nome antigo de propósito: assim nenhum dado se perde.
   Não renomeie o bucket.
+
+TEMAS DO SITE
+  Ajustes → Tema do site: Padrão, Meia-noite, Akiyama, Oceano, Floresta, Vinho, Areia, Lavanda,
+  Menta e Céu. No chat também dá: "tema oceano". O botão Tema do menu volta para o Padrão.
+
+ATALHO
+  Ctrl + M faz o Dex sumir numa nuvem de poeira; apertando de novo, ele reaparece do mesmo jeito.
 
 FANTASIAS PARA DESBLOQUEAR
   Ninja (tour completo) · Lutador (cutucar o Dex 15 vezes) · Samurai (gerar as artes de um mês)

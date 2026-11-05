@@ -63,19 +63,19 @@ html:not(#ak) .ak-hero{background:linear-gradient(160deg,#16191E 0%,#101215 60%,
 html:not(#ak) .ak-hero::before{opacity:.16 !important}
 html:not(#ak) .ak-hero::after{display:none !important}
 /* a ilustração vira tons de cinza trocando as cores direto (filtro em algo animado pesa) */
-html:not(#ak) .ak-arte svg stop[stop-color="#2c32a0"]{stop-color:#3A3E46}
-html:not(#ak) .ak-arte svg stop[stop-color="#32296f"]{stop-color:#24272D}
-html:not(#ak) .ak-arte svg stop[stop-color="#7a70f0"]{stop-color:#8A8F99}
-html:not(#ak) .ak-arte svg stop[stop-color="#3b3399"]{stop-color:#4A4F58}
-html:not(#ak) .ak-arte svg [fill="#32296f"]{fill:#24272D}
-html:not(#ak) .ak-arte svg [stroke="rgba(27,186,204,.6)"]{stroke:rgba(255,255,255,.28)}
-html:not(#ak) .ak-arte svg [stroke="#e7b96a"]{stroke:#C9CCD3}
-html:not(#ak) .ak-arte svg [fill="#e7b96a"]{fill:#D5D8DE}
-html:not(#ak) .ak-arte svg [fill="#40AF73"]{fill:#5A5F69}
-html:not(#ak) .ak-arte svg [fill="#1BBACC"]{fill:#8A8F99}
-html:not(#ak) .ak-arte svg [fill="#0E69BE"]{fill:#5A5F69}
-html:not(#ak) .ak-arte svg [fill="#7818FA"],html:not(#ak) .ak-arte svg [fill="#9143FA"]{fill:#3F434B}
-html:not(#ak) .ak-arte{opacity:.9}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg stop[stop-color="#2c32a0"]{stop-color:#3A3E46}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg stop[stop-color="#32296f"]{stop-color:#24272D}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg stop[stop-color="#7a70f0"]{stop-color:#8A8F99}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg stop[stop-color="#3b3399"]{stop-color:#4A4F58}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#32296f"]{fill:#24272D}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [stroke="rgba(27,186,204,.6)"]{stroke:rgba(255,255,255,.28)}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [stroke="#e7b96a"]{stroke:#C9CCD3}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#e7b96a"]{fill:#D5D8DE}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#40AF73"]{fill:#5A5F69}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#1BBACC"]{fill:#8A8F99}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#0E69BE"]{fill:#5A5F69}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#7818FA"],html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte svg [fill="#9143FA"]{fill:#3F434B}
+html:not(#ak):not([data-ak-paleta="akiyama"]) .ak-arte{opacity:.9}
 html:not(#ak) .ak-etq{color:#8A8F99 !important}
 html:not(#ak) .ak-hero h1,html:not(#ak) .ak-hero h1 *{color:#F2F3F5 !important;-webkit-text-fill-color:#F2F3F5 !important}
 html:not(#ak) .ak-hero-sub{color:#A3A8B1 !important}
@@ -105,3 +105,36 @@ html:not(#ak) .mchip.on,html:not(#ak) .mchip[aria-pressed="true"],html:not(#ak) 
 html:not(#ak) .ico-chap::before{display:none !important}
 html:not(#ak) ::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
 html:not(#ak) dialog::backdrop{background:rgba(8,10,14,.55) !important}
+
+/* ---------- 5. Temas do site (escolhidos em Ajustes → Tema do site) ---------- */
+html:not(#ak):not(#ak2)[data-ak-paleta="meia-noite"]{--bg:#000000;--panel:#0B0B0D;--panel2:#111114;--line:#1E1E22;--line2:#161619;--ink:#F1F2F4;--ink2:#B4B7BE;--ink3:#7C8089;--accent:#C9CDD5;--accent2:#C9CDD5;--accent-soft:#16171B;--accent-ink:#C9CDD5;--onaccent:#000000;--pro-cta:#F1F2F4;--pro-cta-txt:#000000;--pal-side:#000000;--pal-side-b:#18181B;--pal-hero:#0E0E11;--pal-hero2:#050506}
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"]{--bg:#050A33;--panel:#0D1347;--panel2:#111858;--line:#232B6E;--line2:#1A2162;--ink:#F4F5FF;--ink2:#B8BDEB;--ink3:#868DC2;--accent:#9A5CFF;--accent2:#9A5CFF;--accent-soft:#261B61;--accent-ink:#9A5CFF;--onaccent:#FFFFFF;--pro-cta:#7818FA;--pro-cta-txt:#FFFFFF;--pal-side:linear-gradient(180deg,#00093B 0%,#0C1049 46%,#32296F 100%);--pal-side-b:#1D2468;--pal-hero:linear-gradient(160deg,#00093B 0%,#0C1049 48%,#32296F 100%);--pal-hero2:#0A0F44}
+html:not(#ak):not(#ak2)[data-ak-paleta="oceano"]{--bg:#06161C;--panel:#0B2129;--panel2:#0F2830;--line:#173842;--line2:#122E37;--ink:#E6F3F5;--ink2:#A9C6CC;--ink3:#76959C;--accent:#3CC4D4;--accent2:#3CC4D4;--accent-soft:#0E2E36;--accent-ink:#3CC4D4;--onaccent:#04141A;--pro-cta:#3CC4D4;--pro-cta-txt:#04141A;--pal-side:#04141A;--pal-side-b:#123039;--pal-hero:linear-gradient(160deg,#0D3440 0%,#082129 60%,#061A20 100%);--pal-hero2:#061A20}
+html:not(#ak):not(#ak2)[data-ak-paleta="floresta"]{--bg:#0A140F;--panel:#101E17;--panel2:#14251C;--line:#1F3529;--line2:#192C21;--ink:#E8F2EC;--ink2:#AFC6B8;--ink3:#7D9787;--accent:#5FC795;--accent2:#5FC795;--accent-soft:#13281C;--accent-ink:#5FC795;--onaccent:#07110C;--pro-cta:#5FC795;--pro-cta-txt:#07110C;--pal-side:#07110C;--pal-side-b:#18291F;--pal-hero:linear-gradient(160deg,#173123 0%,#0F2017 60%,#0A160F 100%);--pal-hero2:#0A160F}
+html:not(#ak):not(#ak2)[data-ak-paleta="vinho"]{--bg:#160A0E;--panel:#221016;--panel2:#29141B;--line:#3A1C25;--line2:#2F171F;--ink:#F6EAEE;--ink2:#CDB0B9;--ink3:#9B7F88;--accent:#E58FA3;--accent2:#E58FA3;--accent-soft:#2C121B;--accent-ink:#E58FA3;--onaccent:#13070B;--pro-cta:#E58FA3;--pro-cta-txt:#13070B;--pal-side:#13070B;--pal-side-b:#30161E;--pal-hero:linear-gradient(160deg,#36131F 0%,#220C14 60%,#16080D 100%);--pal-hero2:#16080D}
+html:not(#ak):not(#ak2)[data-ak-paleta="areia"]{--bg:#F6F1EA;--panel:#FFFDF9;--panel2:#FAF6F0;--line:#E7DDCF;--line2:#EFE7DC;--ink:#2B2219;--ink2:#5A4C3E;--ink3:#8A7B6A;--accent:#A86B2D;--accent2:#A86B2D;--accent-soft:#F3E7D6;--accent-ink:#A86B2D;--onaccent:#FFFFFF;--pro-cta:#2B2219;--pro-cta-txt:#FFFDF9;--pal-side:#2B2219;--pal-side-b:#3A2E23;--pal-hero:linear-gradient(160deg,#3D3024 0%,#2B2219 60%,#211910 100%);--pal-hero2:#211910}
+html:not(#ak):not(#ak2)[data-ak-paleta="lavanda"]{--bg:#F4F2FB;--panel:#FFFFFF;--panel2:#F9F8FD;--line:#E2DDF2;--line2:#ECE8F7;--ink:#1C1830;--ink2:#4A4466;--ink3:#7A7496;--accent:#6B57D6;--accent2:#6B57D6;--accent-soft:#ECE8FB;--accent-ink:#6B57D6;--onaccent:#FFFFFF;--pro-cta:#1C1830;--pro-cta-txt:#FFFFFF;--pal-side:#1C1830;--pal-side-b:#2A2547;--pal-hero:linear-gradient(160deg,#2C2552 0%,#1E1A3A 60%,#16132B 100%);--pal-hero2:#16132B}
+html:not(#ak):not(#ak2)[data-ak-paleta="menta"]{--bg:#EFF7F3;--panel:#FFFFFF;--panel2:#F6FBF8;--line:#D6EAE0;--line2:#E3F1EA;--ink:#11251C;--ink2:#3E5A4D;--ink3:#6C8579;--accent:#2E8B62;--accent2:#2E8B62;--accent-soft:#E0F1E8;--accent-ink:#2E8B62;--onaccent:#FFFFFF;--pro-cta:#11251C;--pro-cta-txt:#FFFFFF;--pal-side:#0F2219;--pal-side-b:#1A3327;--pal-hero:linear-gradient(160deg,#173628 0%,#10261C 60%,#0B1C14 100%);--pal-hero2:#0B1C14}
+html:not(#ak):not(#ak2)[data-ak-paleta="ceu"]{--bg:#EEF4FA;--panel:#FFFFFF;--panel2:#F6F9FC;--line:#D8E4F0;--line2:#E5EDF6;--ink:#0F1E2E;--ink2:#3D5269;--ink3:#6A7F95;--accent:#2F6FB4;--accent2:#2F6FB4;--accent-soft:#E2EDF8;--accent-ink:#2F6FB4;--onaccent:#FFFFFF;--pro-cta:#0F1E2E;--pro-cta-txt:#FFFFFF;--pal-side:#0E1C2B;--pal-side-b:#1A2C40;--pal-hero:linear-gradient(160deg,#18324E 0%,#10233A 60%,#0B1A2B 100%);--pal-hero2:#0B1A2B}
+html:not(#ak):not(#ak2)[data-ak-paleta] .top{background:var(--pal-side) !important;border-right-color:var(--pal-side-b) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta] .ak-hero{background:var(--pal-hero) !important;border-color:var(--pal-side-b) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta] .inicio-card.principal{background:var(--accent) !important;border-color:var(--accent) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta] .inicio-card.principal *{color:var(--onaccent) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta] .inicio-card.principal .inicio-ico{background:var(--onaccent) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta] .inicio-card.principal .inicio-ico *{color:var(--accent) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta="padrao"] .top{background:#0D0F12 !important}
+/* Akiyama: as cores da marca de volta no menu e no início */
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"] .ak-deco::before{display:block !important}
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"] .ak-deco::after{opacity:.6 !important}
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"] .ak-hero::before{opacity:.8 !important}
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"] .ak-num::after{background:var(--accent) !important}
+html:not(#ak):not(#ak2)[data-ak-paleta="akiyama"] .ak-mes.agora i{background:#fff !important;border-color:#fff !important}
+/* cartões de tema em Ajustes */
+.ak-temas{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.ak-tema{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:3px;padding:8px 8px 10px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);transition:border-color .2s ease,background .2s ease}
+.ak-tema:hover{border-color:var(--ink3)}
+.ak-tema[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.ak-tema svg{display:block;width:100%;height:auto;aspect-ratio:3/2;border-radius:8px;margin-bottom:5px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ak-tema b{font:600 12.5px/1.2 var(--f-ui);color:var(--ink)}
+.ak-tema small{font-size:10.5px;line-height:1.3;color:var(--ink3)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.42s;animation-timing-function:cubic-bezier(.4,0,.2,1)}

@@ -734,7 +734,7 @@
             '<span class="dx-rot">Idioma das respostas</span>'+seg('idioma',[['pt','Português'],['en','English'],['es','Español']])+
             '<p class="dx-nota">O jeito e o idioma valem para as respostas com IA. As respostas do modo local continuam em português.</p></div>'+
           '<div class="dx-painel" data-p="jeito" hidden><span class="dx-rot">Animações</span>'+seg('anim',[['sutil','Sutis'],['normal','Normais'],['expressiva','Expressivas']])+
-            '<span class="dx-rot">Comportamento</span><div class="dx-lista">'+sw('truques','Truques quando estou parado','Espreguiçar, pirueta, pulinho')+sw('seguir','Seguir o mouse com o olhar')+sw('balao','Dicas em balão')+sw('__orb','Mostrar o Dex na tela')+'</div>'+
+            '<span class="dx-rot">Comportamento</span><div class="dx-lista">'+sw('truques','Truques quando estou parado','Espreguiçar, pirueta, pulinho')+sw('seguir','Seguir o mouse com o olhar')+sw('balao','Dicas em balão')+sw('__orb','Mostrar o Dex na tela','Atalho: Ctrl + M faz ele sumir e aparecer numa nuvem de poeira')+'</div>'+
             '<span class="dx-rot">Desempenho</span>'+seg('__leve',[['auto','Automático'],['sim','Modo leve'],['nao','Completo']])+
             '<p class="dx-nota">No automático, computadores mais simples recebem a versão leve: os efeitos mais caros saem e as animações continuam.</p></div>'+
         '</div>'+
@@ -1028,12 +1028,12 @@
     'O Chapeleiro me disse que eu tenho cabeça boa. Pena que não cabe chapéu nenhum.'];
   function enviarTexto(t){ if(!form||!input) return; input.value=t; try{ form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true})); }catch(e){} }
   function chips(grupos,caixa){ var c=el('div','dx-ajuda'); grupos.forEach(function(g){ var h=el('div','dx-ajuda-g'); h.appendChild(el('span','dx-ajuda-t',esc(g[0]))); var w=el('div','dx-ajuda-c');
-      g[1].forEach(function(x){ var b=el('button','dx-chip-cmd',esc(x[0])); b.type='button'; b.onclick=function(){ if(/ $/.test(x[1])){ input.value=x[1]; form.classList.add('tem-texto'); input.focus(); } else enviarTexto(x[1]); }; w.appendChild(b); }); h.appendChild(w); c.appendChild(h); }); caixa.appendChild(c); rolar(); }
+      g[1].forEach(function(x){ var b=el('button','dx-chip-cmd',esc(x[0])); b.type='button'; b.onclick=function(){ if(x[1]==='__ctrlm'){ alternarDex(); return; } if(/ $/.test(x[1])){ input.value=x[1]; form.classList.add('tem-texto'); input.focus(); } else enviarTexto(x[1]); }; w.appendChild(b); }); h.appendChild(w); c.appendChild(h); }); caixa.appendChild(c); rolar(); }
   function ajuda(){ var b=falaBot(CFG.jeito==='formal'?'Estas são as coisas que posso fazer por você:':'Olha tudo que eu sei fazer (toque para testar):');
     chips([['Pessoas',[['Quem é…','quem é '],['Próximo aniversariante','próximo aniversariante'],['Fotos com nota baixa','fotos com nota baixa'],['Fora das listas','quem está fora das listas']]],
       ['Mês e ano',[['Resumo do mês','resumo do mês'],['Pendências','pendências'],['Hoje','hoje'],['Próximos 7 dias','próximos 7 dias'],['Resumo do ano','resumo do ano'],['Copiar a lista','copiar a lista do mês']]],
       ['Artes',[['Gerar o mês','gerar o mês'],['Baixar arte de…','baixar a arte de '],['Baixar o ZIP','baixar todas zip'],['Espaço no Supabase','espaço']]],
-      ['Dex',[['Tour','/tour'],['Meu consumo','/status'],['Conquistas','conquistas'],['Uma piada','conta uma piada'],['Um truque','faz um truque']]]],b); reagir('feliz',1000); }
+      ['Dex',[['Sumir (Ctrl+M)','__ctrlm'],['Temas do site','temas'],['Tour','/tour'],['Meu consumo','/status'],['Conquistas','conquistas'],['Uma piada','conta uma piada'],['Um truque','faz um truque']]]],b); reagir('feliz',1000); }
   function mesAberto(){ return num(function(){ return state.months[mk(state.year,state.month)]; }); }
   function todasEntradas(ano){ var out=[]; num(function(){ Object.keys(state.months).forEach(function(k){ if(ano&&+k.slice(0,4)!==ano) return; (state.months[k].entries||[]).forEach(function(e){ out.push({k:k,e:e}); }); }); }); return out; }
   function proximoAniv(caixa){
@@ -1103,8 +1103,19 @@
     [/\b(fora das listas|sem aniversario|nao (esta|estao) em nenhuma lista|sem data)\b/,function(){ var b=falaBot('Cadastrados que não aparecem em nenhuma lista:'); foraDasListas(b); }],
     [/\bcopi(ar|a|e)\b.*\blista\b(?:.*\b(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b)?/,function(m){ var b=falaBot('Copiando a lista…'); copiarLista(m[2],b); }],
     [/\b(baixar|baixa|salvar|salva|download)\b (?:a |o )?(?:arte|png|imagem) d[aeo]s? (.+)$/,function(m){ var b=falaBot(''); b.querySelector('.dex-txt').remove(); baixarArte(m[2],b); }]];
+  function temasSite(arg){
+    var P=W.__akPaleta; if(!P) return false;
+    if(arg&&/^(escuro|claro|automatico|dark|light|auto)$/.test(arg)) return false;
+    falaUser(arguments[1]);
+    if(arg&&P.aplicar(arg)){ falaBot('Pronto, tema <b>'+esc(P.lista.filter(function(x){ return x.id===P.atual(); })[0].nome)+'</b> aplicado!'); reagir('comemorando',1200); return true; }
+    var b=falaBot(arg?'Não conheço esse tema. Escolha um:':'Escolha o tema do site:'); var g=el('div','dx-ajuda-c');
+    P.lista.forEach(function(x){ var c=el('button','dx-chip-cmd'+(x.id===P.atual()?' on':''),esc(x.nome)); c.type='button'; c.onclick=function(){ P.aplicar(x.id); g.querySelectorAll('.on').forEach(function(o){ o.classList.remove('on'); }); c.classList.add('on'); reagir('feliz',900); }; g.appendChild(c); });
+    g.style.marginTop='10px'; b.appendChild(g); rolar(); return true;
+  }
   function funcoesExtras(t){
     var n=normalizar(t).replace(/[?!.]+$/,'').trim();
+    var mt=n.match(/^(?:temas?(?: do site)?|mud(?:ar|a|e) (?:o )?tema(?: do site)?(?: para| pra)?|troc(?:ar|a|e) (?:o )?tema(?: do site)?(?: para| pra)?|usar (?:o )?tema|quero (?:o )?tema)\s*(.*)$/);
+    if(mt&&temasSite(mt[1].trim(),t)) return true;
     for(var i=0;i<RE_F.length;i++){ var m=n.match(RE_F[i][0]); if(m){ falaUser(t); RE_F[i][1](m); return true; } }
     return false;
   }
@@ -1180,6 +1191,7 @@
         case 'baixar_arte': if(arg) botoes.push({t:'Baixar a arte de '+arg,fn:function(){ baixarArte(arg,caixa); }}); break;
         case 'vestir': if(arg&&caixa) vestir(arg,caixa); break;
         case 'truque': truque('pirueta'); break;
+        case 'tema_site': if(arg&&W.__akPaleta) W.__akPaleta.aplicar(arg); break;
         case 'gerar_mes': rodarComando('gerar o mês de '+(arg||num(function(){ return MESNOME[state.month-1]; })||'')); break;
         case 'gerar_arte': if(arg) botoes.push({t:'Gerar a arte de '+arg,fn:function(){ rodarComando('gerar arte da '+arg); }}); break;
         case 'editar_dex': botoes.push({t:'Abrir o Estúdio do Dex',fn:abrirEstudio}); break;
@@ -1266,6 +1278,45 @@
     usoDia(); USO.locais=(USO.locais||0)+1; salvarUso();
     hist.push({role:'user',content:t},{role:'assistant',content:'(mostrei no chat a ficha ou a lista pedida)'}); if(hist.length>12) hist=hist.slice(-12);
   },true);
+
+  /* =================================================================== 11d. CTRL + M: SOME E APARECE NUMA NUVEM DE POEIRA */
+  function nuvem(x,y,k){
+    var box=el('div','dx-poeira'); box.style.left=x+'px'; box.style.top=y+'px'; D.body.appendChild(box);
+    var leve=M.leve&&M.leve(), n=leve?7:11, fim=0;
+    for(var i=0;i<n;i++){
+      var b=el('i','dx-poeira-b'), r=(16+Math.random()*16)*k, a=Math.PI*2*i/n+Math.random()*.5, d=(26+Math.random()*30)*k;
+      b.style.width=b.style.height=r*2+'px'; b.style.marginLeft=b.style.marginTop=-r+'px'; box.appendChild(b);
+      var dur=560+Math.random()*320; fim=Math.max(fim,dur);
+      b.animate([{transform:'translate(0,0) scale(.25)',opacity:.95},{transform:'translate('+(Math.cos(a)*d*.55)+'px,'+(Math.sin(a)*d*.4-6*k)+'px) scale(1)',opacity:.85,offset:.35},
+        {transform:'translate('+(Math.cos(a)*d)+'px,'+(Math.sin(a)*d*.75-18*k)+'px) scale(1.35)',opacity:0}],{duration:dur,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'});
+    }
+    for(var j=0;j<5;j++){ var s2=el('i','dx-poeira-s'), a2=Math.random()*Math.PI*2, d2=(40+Math.random()*30)*k; box.appendChild(s2);
+      s2.animate([{transform:'translate(0,0) scale(0) rotate(0)',opacity:1},{transform:'translate('+(Math.cos(a2)*d2)+'px,'+(Math.sin(a2)*d2-20)+'px) scale(1) rotate(90deg)',opacity:1,offset:.5},
+        {transform:'translate('+(Math.cos(a2)*d2*1.2)+'px,'+(Math.sin(a2)*d2*1.2-30)+'px) scale(0) rotate(180deg)',opacity:0}],{duration:700,easing:'ease-out',fill:'forwards'}); }
+    setTimeout(function(){ box.remove(); },fim+120);
+  }
+  var trocandoVis=false;
+  function alternarDex(){
+    if(trocandoVis) return; trocandoVis=true;
+    var some=H.getAttribute('data-ak-orb')!=='nao';
+    if(some){
+      if(E.guia) fimGuia();
+      var r=btn.getBoundingClientRect(), k=Math.max(.8,r.width/96);
+      nuvem(r.left+r.width/2,r.top+r.height*.55,k);
+      var a=btn.animate([{transform:'none',opacity:1},{transform:'scale(1.12,.9)',opacity:1,offset:.3},{transform:'scale(.15) translateY(20%)',opacity:0}],{duration:parado()?1:300,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'});
+      a.finished.then(function(){ definir('__orb','nao'); a.cancel(); trocandoVis=false; if(est&&est.open) marcarEstudio(false); },function(){ trocandoVis=false; });
+    } else {
+      definir('__orb','sim'); cacheRect();
+      var r2=btn.getBoundingClientRect(), k2=Math.max(.8,r2.width/96);
+      nuvem(r2.left+r2.width/2,r2.top+r2.height*.55,k2);
+      var b=btn.animate([{transform:'scale(0)',opacity:0},{transform:'scale(0)',opacity:0,offset:.25},{transform:'scale(1.18,.86)',opacity:1,offset:.6},{transform:'scale(.95,1.06)',offset:.8},{transform:'none',opacity:1}],{duration:parado()?1:620,easing:'cubic-bezier(.3,.7,.3,1)'});
+      b.finished.then(function(){ trocandoVis=false; },function(){ trocandoVis=false; });
+      setTimeout(function(){ reagir('feliz',1200); },420);
+      if(est&&est.open) marcarEstudio(false);
+    }
+  }
+  W.addEventListener('keydown',function(e){ if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&(e.key==='m'||e.key==='M'||e.code==='KeyM')){ e.preventDefault(); alternarDex(); } },true);
+  W.__dexAlternar=alternarDex;
 
   /* =================================================================== 12. INÍCIO */
   if(chat) chat.querySelectorAll('[data-prompt]').forEach(function(b){ if(/AniverCut/i.test(b.dataset.prompt)) b.dataset.prompt=b.dataset.prompt.replace(/AniverCut/gi,'AkiCut'); });

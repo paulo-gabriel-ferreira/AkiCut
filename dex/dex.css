@@ -360,6 +360,7 @@ html.dex-on[data-dex-lado="esquerda"]:not([data-ak-orb="nao"]) #aiChat{right:24p
 #aiChat .dx-ajuda-c{display:flex;flex-wrap:wrap;gap:6px}
 #aiChat .dx-chip-cmd{all:unset;cursor:pointer;padding:7px 11px;border-radius:999px;background:var(--dx-sup);border:1px solid var(--dx-borda);font:500 12px/1 var(--f-ui);color:var(--dx-txt);transition:background .2s ease}
 #aiChat .dx-chip-cmd:hover{background:var(--dx-sup2)}
+#aiChat .dx-chip-cmd.on{background:var(--dx-inv);color:var(--dx-inv-txt);border-color:var(--dx-inv)}
 #aiChat .dx-ano{margin-top:10px;padding:12px;border-radius:16px;background:var(--dx-sup);border:1px solid var(--dx-borda);display:grid;gap:3px}
 #aiChat .dx-ano-topo{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
 #aiChat .dx-ano-topo b{font:650 15px/1 var(--f-num,var(--f-ui));color:var(--dx-forte)}
@@ -604,3 +605,11 @@ html.ak-leve .dex-palavra{animation:none !important;opacity:1}
 .dex-fixo,.dex-fixo *{animation:none !important;transition:none !important}
 html[data-ak-mov="suaves"] .dex-flut,html[data-ak-mov="suaves"] .dex-sombra,html[data-ak-mov="suaves"] .dex-osc{animation:none !important}
 @media (prefers-reduced-motion:reduce){.dex *,.dex-svg *{animation:none !important}}
+
+/* ============ 12. NUVEM DE POEIRA (Ctrl + M) ============ */
+.dx-poeira{position:fixed;width:0;height:0;z-index:2147483200;pointer-events:none}
+.dx-poeira-b{position:absolute;left:0;top:0;border-radius:50%;opacity:0;will-change:transform,opacity;
+  background:radial-gradient(circle at 38% 35%,#fff 0%,#E4E7EC 38%,rgba(196,201,209,.85) 62%,rgba(196,201,209,0) 72%)}
+html[data-theme="dark"] .dx-poeira-b{background:radial-gradient(circle at 38% 35%,#F2F3F5 0%,#C9CED6 40%,rgba(140,146,156,.8) 62%,rgba(140,146,156,0) 72%)}
+.dx-poeira-s{position:absolute;left:-4px;top:-4px;width:8px;height:8px;opacity:0;background:#fff;
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
